@@ -1,12 +1,12 @@
 {
-  "domain": "simple_plant",
-  "name": "Simple Plant",
-  "codeowners": [
-    "@ndesgranges"
-  ],
-  "config_flow": true,
-  "documentation": "https://github.com/ndesgranges/simple-plant",
-  "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/ndesgranges/simple-plant/issues",
-  "version": "0.1.0"
+    "domain": "simple_plant",
+    "name": "Simple Plant",
+    "codeowners": [
+        "@ndesgranges"
+    ],
+    "config_flow": true,
+    "documentation": "https://github.com/ndesgranges/simple-plant",
+    "iot_class": "local_polling",
+    "issue_tracker": "https://github.com/ndesgranges/simple-plant/issues",
+    "version": "0.1.0"
 }

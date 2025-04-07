@@ -21,9 +21,16 @@ if TYPE_CHECKING:
 
 ENTITY_DESCRIPTIONS = (
     BinarySensorEntityDescription(
-        key="simple_plant",
-        name="Simple Plant Binary Sensor",
-        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        key="simple_plant_todo",
+        name="Simple Plant Binary Sensor Todo",
+        device_class=BinarySensorDeviceClass.MOISTURE,
+        icon="mdi:water-check-outline",
+    ),
+    BinarySensorEntityDescription(
+        key="simple_plant_problem",
+        name="Simple Plant Binary Sensor Problem",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        icon="mdi:water-alert-outline",
     ),
 )
 

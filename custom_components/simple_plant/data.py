@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.loader import Integration
 
-    from .api import SimplePlantApiClient
     from .coordinator import SimplePlantDataUpdateCoordinator
 
 

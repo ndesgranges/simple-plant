@@ -4,8 +4,11 @@
             "user": {
                 "description": "If you need help with the configuration have a look here: https://github.com/ndesgranges/simple-plant",
                 "data": {
-                    "username": "Username",
-                    "password": "Password"
+                    "name": "Name",
+                    "last_time_watered": "Last time watered",
+                    "photo": "Photo",
+                    "current_health": "Current health",
+                    "comment": "Comment"
                 }
             }
         },

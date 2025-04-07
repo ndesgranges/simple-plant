@@ -14,8 +14,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
 
-from .api import SimplePlantApiClient
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN, LOGGER, PLATFORMS
 from .coordinator import SimplePlantDataUpdateCoordinator
 from .data import SimplePlantData
 
@@ -23,12 +22,6 @@ if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
 
     from .data import SimplePlantConfigEntry
-
-PLATFORMS: list[Platform] = [
-    Platform.SENSOR,
-    Platform.BINARY_SENSOR,
-    Platform.SWITCH,
-]
 
 
 # https://developers.home-assistant.io/docs/config_entries_index/#setting-up-an-entry
