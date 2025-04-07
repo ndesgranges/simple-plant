@@ -1,4 +1,4 @@
-"""Switch platform for integration_blueprint."""
+"""Switch platform for simple_plant."""
 
 from __future__ import annotations
 
@@ -6,18 +6,18 @@ from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 
-from .entity import IntegrationBlueprintEntity
+from .entity import SimplePlantEntity
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
     from .coordinator import BlueprintDataUpdateCoordinator
-    from .data import IntegrationBlueprintConfigEntry
+    from .data import SimplePlantConfigEntry
 
 ENTITY_DESCRIPTIONS = (
     SwitchEntityDescription(
-        key="integration_blueprint",
+        key="simple_plant",
         name="Integration Switch",
         icon="mdi:format-quote-close",
     ),
@@ -26,12 +26,12 @@ ENTITY_DESCRIPTIONS = (
 
 async def async_setup_entry(
     hass: HomeAssistant,  # noqa: ARG001 Unused function argument: `hass`
-    entry: IntegrationBlueprintConfigEntry,
+    entry: SimplePlantConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the switch platform."""
     async_add_entities(
-        IntegrationBlueprintSwitch(
+        SimplePlantSwitch(
             coordinator=entry.runtime_data.coordinator,
             entity_description=entity_description,
         )
@@ -39,8 +39,8 @@ async def async_setup_entry(
     )
 
 
-class IntegrationBlueprintSwitch(IntegrationBlueprintEntity, SwitchEntity):
-    """integration_blueprint switch class."""
+class SimplePlantSwitch(SimplePlantEntity, SwitchEntity):
+    """simple_plant switch class."""
 
     def __init__(
         self,

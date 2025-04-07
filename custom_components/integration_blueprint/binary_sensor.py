@@ -1,4 +1,4 @@
-"""Binary sensor platform for integration_blueprint."""
+"""Binary sensor platform for simple_plant."""
 
 from __future__ import annotations
 
@@ -10,18 +10,18 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 
-from .entity import IntegrationBlueprintEntity
+from .entity import SimplePlantEntity
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
     from .coordinator import BlueprintDataUpdateCoordinator
-    from .data import IntegrationBlueprintConfigEntry
+    from .data import SimplePlantConfigEntry
 
 ENTITY_DESCRIPTIONS = (
     BinarySensorEntityDescription(
-        key="integration_blueprint",
+        key="simple_plant",
         name="Integration Blueprint Binary Sensor",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
     ),
@@ -30,12 +30,12 @@ ENTITY_DESCRIPTIONS = (
 
 async def async_setup_entry(
     hass: HomeAssistant,  # noqa: ARG001 Unused function argument: `hass`
-    entry: IntegrationBlueprintConfigEntry,
+    entry: SimplePlantConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the binary_sensor platform."""
     async_add_entities(
-        IntegrationBlueprintBinarySensor(
+        SimplePlantBinarySensor(
             coordinator=entry.runtime_data.coordinator,
             entity_description=entity_description,
         )
@@ -43,8 +43,8 @@ async def async_setup_entry(
     )
 
 
-class IntegrationBlueprintBinarySensor(IntegrationBlueprintEntity, BinarySensorEntity):
-    """integration_blueprint binary_sensor class."""
+class SimplePlantBinarySensor(SimplePlantEntity, BinarySensorEntity):
+    """simple_plant binary_sensor class."""
 
     def __init__(
         self,

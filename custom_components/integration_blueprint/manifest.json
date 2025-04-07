@@ -1,12 +1,12 @@
 {
-  "domain": "integration_blueprint",
-  "name": "Integration blueprint",
+  "domain": "simple_plant",
+  "name": "Simple Plant",
   "codeowners": [
-    "@ludeeus"
+    "@ndesgranges"
   ],
   "config_flow": true,
-  "documentation": "https://github.com/ludeeus/integration_blueprint",
+  "documentation": "https://github.com/ndesgranges/simple-plant",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/ludeeus/integration_blueprint/issues",
+  "issue_tracker": "https://github.com/ndesgranges/simple-plant/issues",
   "version": "0.1.0"
 }
