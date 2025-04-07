@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from homeassistant.loader import Integration
 
     from .api import SimplePlantApiClient
-    from .coordinator import BlueprintDataUpdateCoordinator
+    from .coordinator import SimplePlantDataUpdateCoordinator
 
 
 type SimplePlantConfigEntry = ConfigEntry[SimplePlantData]
@@ -18,8 +18,8 @@ type SimplePlantConfigEntry = ConfigEntry[SimplePlantData]
 
 @dataclass
 class SimplePlantData:
-    """Data for the Blueprint integration."""
+    """Data for the Simple Plant integration."""
 
     client: SimplePlantApiClient
-    coordinator: BlueprintDataUpdateCoordinator
+    coordinator: SimplePlantDataUpdateCoordinator
     integration: Integration
