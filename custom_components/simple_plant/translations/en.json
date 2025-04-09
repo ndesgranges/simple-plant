@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "description": "If you need help with the configuration have a look here: https://github.com/ndesgranges/simple-plant",
+                "description": "Provide base information for your new plant. If you need help with the configuration have a look here: https://github.com/ndesgranges/simple-plant",
                 "data": {
                     "name": "Name",
                     "last_time_watered": "Last time watered",

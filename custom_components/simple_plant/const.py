@@ -6,7 +6,8 @@ from homeassistant.const import Platform
 LOGGER: Logger = getLogger(__package__)
 
 DOMAIN = "simple_plant"
-ATTRIBUTION = "Data provided by http://jsonplaceholder.typicode.com/"
+
+STORAGE_DIR = "simple_plant"
 
 PLATFORMS: list[Platform] = [
     Platform.BUTTON,
