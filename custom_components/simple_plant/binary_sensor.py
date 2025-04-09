@@ -10,20 +10,16 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 
-from .entity import SimplePlantEntity
-
 if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-    from .coordinator import SimplePlantDataUpdateCoordinator
-    from .data import SimplePlantConfigEntry
 
 ENTITY_DESCRIPTIONS = (
     BinarySensorEntityDescription(
         key="simple_plant_todo",
         name="Simple Plant Binary Sensor Todo",
-        device_class=BinarySensorDeviceClass.MOISTURE,
+        # device_class=BinarySensorDeviceClass.MOISTURE,  # noqa: ERA001
         icon="mdi:water-check-outline",
     ),
     BinarySensorEntityDescription(
@@ -36,33 +32,33 @@ ENTITY_DESCRIPTIONS = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant,  # noqa: ARG001 Unused function argument: `hass`
-    entry: SimplePlantConfigEntry,
+    hass: HomeAssistant,
+    config: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the binary_sensor platform."""
     async_add_entities(
-        SimplePlantBinarySensor(
-            coordinator=entry.runtime_data.coordinator,
-            entity_description=entity_description,
-        )
+        SimplePlantBinarySensor(hass, config, entity_description)
         for entity_description in ENTITY_DESCRIPTIONS
     )
 
 
-class SimplePlantBinarySensor(SimplePlantEntity, BinarySensorEntity):
+class SimplePlantBinarySensor(BinarySensorEntity):
     """simple_plant binary_sensor class."""
 
     def __init__(
         self,
-        coordinator: SimplePlantDataUpdateCoordinator,
-        entity_description: BinarySensorEntityDescription,
+        _hass: HomeAssistant,
+        _config: ConfigEntry,
+        description: BinarySensorEntityDescription,
     ) -> None:
         """Initialize the binary_sensor class."""
-        super().__init__(coordinator)
-        self.entity_description = entity_description
+        self.entity_description = description
+        self._attr_unique_id = f"{description.key}_{_config.title}"
+        self._attr_name = f"{description.key}_{_config.title}"
+        self._attr_native_value = False
 
     @property
     def is_on(self) -> bool:
         """Return true if the binary_sensor is on."""
-        return self.coordinator.data.get("title", "") == "foo"
+        return self._attr_native_value

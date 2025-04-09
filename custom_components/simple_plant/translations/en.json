@@ -6,6 +6,7 @@
                 "data": {
                     "name": "Name",
                     "last_time_watered": "Last time watered",
+                    "days_between_watering": "Days between watering",
                     "photo": "Photo",
                     "current_health": "Current health",
                     "comment": "Comment"

@@ -10,7 +10,7 @@ from homeassistant import config_entries
 from homeassistant.components.file_upload import process_uploaded_file
 from homeassistant.helpers import selector
 
-from .const import DOMAIN, LOGGER, STORAGE_DIR
+from .const import DOMAIN, HEALTH_OPTIONS, LOGGER, STORAGE_DIR
 
 
 class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -68,17 +68,18 @@ def user_form() -> vol.Schema:
             vol.Required("last_time_watered"): selector.DateSelector(
                 selector.DateSelectorConfig(),
             ),
+            vol.Required("days_between_watering"): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=1,
+                    max=60,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="days",
+                ),
+            ),
             vol.Required("current_health"): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     {
-                        "options": [
-                            "notset",
-                            "poor",
-                            "fair",
-                            "good",
-                            "verygood",
-                            "excellent",
-                        ],
+                        "options": HEALTH_OPTIONS,
                         "custom_value": False,
                         "sort": False,
                     }
