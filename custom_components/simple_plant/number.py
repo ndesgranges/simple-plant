@@ -84,7 +84,17 @@ class SimplePlantNumber(NumberEntity):
         self._hass.config_entries.async_update_entry(
             self._entry,
             data=new_data,
+            options=self._entry.options,
         )
 
         # Trigger state update
         self.async_write_ha_state()
+
+        # Notify dependent entities
+        device = self._entry.title
+        await self._hass.helpers.entity_component.async_update_entity(
+            f"binary_sensor.simple_plant_todo_{device}"
+        )
+        await self._hass.helpers.entity_component.async_update_entity(
+            f"binary_sensor.simple_plant_problem_{device}"
+        )

@@ -89,7 +89,14 @@ class SimplePlantTodo(SimplePlantBinarySensor):
         nb_days = self.hass.states.get(
             f"number.{DOMAIN}_days_between_waterings_{device}"
         )
-        if last_watered is None or nb_days is None:
+        if (
+            last_watered is None
+            or nb_days is None
+            or last_watered.state == "unavailable"
+            or nb_days.state == "unavailable"
+        ):
+            self._attr_native_value = False
+            self.async_write_ha_state()
             return
 
         last_watered_date = date.fromisoformat(last_watered.state)
@@ -112,7 +119,14 @@ class SimplePlantProblem(SimplePlantBinarySensor):
         nb_days = self.hass.states.get(
             f"number.{DOMAIN}_days_between_waterings_{device}"
         )
-        if last_watered is None or nb_days is None:
+        if (
+            last_watered is None
+            or nb_days is None
+            or last_watered.state == "unavailable"
+            or nb_days.state == "unavailable"
+        ):
+            self._attr_native_value = False
+            self.async_write_ha_state()
             return
 
         last_watered_date = date.fromisoformat(last_watered.state)
