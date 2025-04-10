@@ -81,7 +81,7 @@ def user_form() -> vol.Schema:
             vol.Required("last_time_watered"): selector.DateSelector(
                 selector.DateSelectorConfig(),
             ),
-            vol.Required("days_between_watering"): selector.NumberSelector(
+            vol.Required("days_between_waterings"): selector.NumberSelector(
                 selector.NumberSelectorConfig(
                     min=1,
                     max=60,

@@ -46,20 +46,20 @@ class SimplePlantSelect(SelectEntity):
     def __init__(
         self,
         _hass: HomeAssistant,
-        _config: ConfigEntry,
+        entry: ConfigEntry,
         description: SelectEntityDescription,
     ) -> None:
         """Initialize the select class."""
         super().__init__()
         self.entity_description = description
-        self._attr_unique_id = f"{description.key}_{_config.title}"
-        self._attr_name = f"{description.key}_{_config.title}"
-        self._attr_current_option = _config.data.get("current_health")
+        self._attr_unique_id = f"{description.key}_{entry.title}"
+        self._attr_name = f"{description.key}_{entry.title}"
+        self._attr_current_option = entry.data.get("current_health")
 
         # Set up device info
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{_config.title}")},
-            name=_config.title,
+            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            name=entry.title,
             manufacturer=MANUFACTURER,
         )
 

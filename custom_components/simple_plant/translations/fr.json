@@ -6,7 +6,7 @@
                 "data": {
                     "name": "Nom",
                     "last_time_watered": "Dernier arrosage",
-                    "days_between_watering": "Nombre de jours entre chaque arrosage",
+                    "days_between_waterings": "Nombre de jours entre chaque arrosage",
                     "photo": "Photo",
                     "current_health": "Santé actuelle",
                     "comment": "Commentaire"

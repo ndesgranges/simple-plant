@@ -48,26 +48,43 @@ class SimplePlantNumber(NumberEntity):
 
     def __init__(
         self,
-        _hass: HomeAssistant,
-        _config: ConfigEntry,
+        hass: HomeAssistant,
+        entry: ConfigEntry,
         description: NumberEntityDescription,
     ) -> None:
         """Initialize the number class."""
         super().__init__()
+        self._hass = hass
+        self._entry = entry
         self.entity_description = description
-        self._attr_unique_id = f"{description.key}_{_config.title}"
-        self._attr_name = f"{description.key}_{_config.title}"
+        self._attr_unique_id = f"{description.key}_{entry.title}"
+        self._attr_name = f"{description.key}_{entry.title}"
 
         self._attr_native_min_value = 1
         self._attr_native_max_value = 60
         self._attr_native_step = 1
         self._attr_native_unit_of_measurement = "days"
 
-        self._attr_native_value = _config.data.get("days_between_watering")
+        self._attr_native_value = entry.data.get("days_between_waterings")
 
         # Set up device info
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{_config.title}")},
-            name=_config.title,
+            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            name=entry.title,
             manufacturer=MANUFACTURER,
         )
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update the current value."""
+        self._attr_native_value = value
+
+        # If you need to persist the value in configuration
+        new_data = dict(self._entry.data)
+        new_data["days_between_waterings"] = value
+        self._hass.config_entries.async_update_entry(
+            self._entry,
+            data=new_data,
+        )
+
+        # Trigger state update
+        self.async_write_ha_state()

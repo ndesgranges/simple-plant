@@ -46,21 +46,21 @@ class SimplePlantDate(DateEntity):
     def __init__(
         self,
         _hass: HomeAssistant,
-        _config: ConfigEntry,
+        entry: ConfigEntry,
         description: DateEntityDescription,
     ) -> None:
         """Initialize the date class."""
         super().__init__()
         self.entity_description = description
-        self._attr_unique_id = f"{description.key}_{_config.title}"
-        self._attr_name = f"{description.key}_{_config.title}"
+        self._attr_unique_id = f"{description.key}_{entry.title}"
+        self._attr_name = f"{description.key}_{entry.title}"
         self._attr_native_value = date.fromisoformat(
-            str(_config.data.get("last_time_watered"))
+            str(entry.data.get("last_time_watered"))
         )
         # Set up device info
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{_config.title}")},
-            name=_config.title,
+            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            name=entry.title,
             manufacturer=MANUFACTURER,
         )
 

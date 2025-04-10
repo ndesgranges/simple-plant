@@ -47,25 +47,25 @@ class SimplePlantImage(ImageEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        _config: ConfigEntry,
+        entry: ConfigEntry,
         description: ImageEntityDescription,
     ) -> None:
         """Initialize the image class."""
         super().__init__(hass)
         self.entity_description = description
-        self._attr_unique_id = f"{description.key}_{_config.title}"
-        self._attr_name = f"{description.key}_{_config.title}"
+        self._attr_unique_id = f"{description.key}_{entry.title}"
+        self._attr_name = f"{description.key}_{entry.title}"
         self._attr_image_url = hass.config.path(
-            str(_config.data.get("photo")).lstrip("/")
+            str(entry.data.get("photo")).lstrip("/")
         )
 
         self._attr_content_type = self._get_content_type(
-            Path(str(_config.data.get("photo")))
+            Path(str(entry.data.get("photo")))
         )
         # Set up device info
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{_config.title}")},
-            name=_config.title,
+            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            name=entry.title,
             manufacturer=MANUFACTURER,
         )
 
