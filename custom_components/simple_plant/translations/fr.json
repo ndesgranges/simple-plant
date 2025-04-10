@@ -2,14 +2,14 @@
     "config": {
         "step": {
             "user": {
-                "description": "Provide base information for your new plant. If you need help with the configuration have a look here: https://github.com/ndesgranges/simple-plant",
+                "description": "Informations de base de votre plante. Si vous avez besoin d'aide, allez jeter un oeil ici : https://github.com/ndesgranges/simple-plant",
                 "data": {
-                    "name": "Name",
-                    "last_time_watered": "Last time watered",
-                    "days_between_watering": "Days between watering",
+                    "name": "Nom",
+                    "last_time_watered": "Dernier arrosage",
+                    "days_between_watering": "Nombre de jours entre chaque arrosage",
                     "photo": "Photo",
-                    "current_health": "Current health",
-                    "comment": "Comment"
+                    "current_health": "Santé actuelle",
+                    "comment": "Commentaire"
                 }
             }
         },

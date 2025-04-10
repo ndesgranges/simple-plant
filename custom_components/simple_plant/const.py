@@ -1,6 +1,7 @@
 """Constants for simple_plant."""
 
 from logging import Logger, getLogger
+
 from homeassistant.const import Platform
 
 LOGGER: Logger = getLogger(__package__)
@@ -8,6 +9,8 @@ LOGGER: Logger = getLogger(__package__)
 DOMAIN = "simple_plant"
 
 STORAGE_DIR = "simple_plant"
+
+MANUFACTURER = "Simple Plant"
 
 HEALTH_OPTIONS = [
     "notset",
@@ -17,6 +20,17 @@ HEALTH_OPTIONS = [
     "verygood",
     "excellent",
 ]
+
+IMAGES_MIME_TYPES = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".bmp": "image/bmp",
+    ".webp": "image/webp",
+    ".tiff": "image/tiff",
+    ".svg": "image/svg+xml",
+}
 
 PLATFORMS: list[Platform] = [
     Platform.BUTTON,

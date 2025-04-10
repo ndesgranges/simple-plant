@@ -8,8 +8,9 @@ from homeassistant.components.select import (
     SelectEntity,
     SelectEntityDescription,
 )
+from homeassistant.helpers.device_registry import DeviceInfo
 
-from .const import HEALTH_OPTIONS
+from .const import DOMAIN, HEALTH_OPTIONS, MANUFACTURER
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -29,12 +30,12 @@ ENTITY_DESCRIPTIONS = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config: ConfigEntry,
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the select platform."""
     async_add_entities(
-        SimplePlantSelect(hass, config, entity_description)
+        SimplePlantSelect(hass, entry, entity_description)
         for entity_description in ENTITY_DESCRIPTIONS
     )
 
@@ -49,10 +50,18 @@ class SimplePlantSelect(SelectEntity):
         description: SelectEntityDescription,
     ) -> None:
         """Initialize the select class."""
+        super().__init__()
         self.entity_description = description
         self._attr_unique_id = f"{description.key}_{_config.title}"
         self._attr_name = f"{description.key}_{_config.title}"
         self._attr_current_option = _config.data.get("current_health")
+
+        # Set up device info
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"{DOMAIN}_{_config.title}")},
+            name=_config.title,
+            manufacturer=MANUFACTURER,
+        )
 
     def select_option(self, option: str) -> None:
         """Change the selected option."""

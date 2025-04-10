@@ -8,6 +8,9 @@ from homeassistant.components.button import (
     ButtonEntity,
     ButtonEntityDescription,
 )
+from homeassistant.helpers.device_registry import DeviceInfo
+
+from .const import DOMAIN, MANUFACTURER
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -26,12 +29,12 @@ ENTITY_DESCRIPTIONS = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config: ConfigEntry,
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the button platform."""
     async_add_entities(
-        SimplePlantButton(hass, config, entity_description)
+        SimplePlantButton(hass, entry, entity_description)
         for entity_description in ENTITY_DESCRIPTIONS
     )
 
@@ -46,9 +49,16 @@ class SimplePlantButton(ButtonEntity):
         description: ButtonEntityDescription,
     ) -> None:
         """Initialize the button class."""
+        super().__init__()
         self.entity_description = description
         self._attr_unique_id = f"{description.key}_{_config.title}"
         self._attr_name = f"{description.key}_{_config.title}"
+        # Set up device info
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"{DOMAIN}_{_config.title}")},
+            name=_config.title,
+            manufacturer=MANUFACTURER,
+        )
 
     def press(self) -> None:
         """Press the button."""

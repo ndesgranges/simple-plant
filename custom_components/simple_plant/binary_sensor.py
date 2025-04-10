@@ -9,6 +9,9 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
+from homeassistant.helpers.device_registry import DeviceInfo
+
+from .const import DOMAIN, MANUFACTURER
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -19,7 +22,6 @@ ENTITY_DESCRIPTIONS = (
     BinarySensorEntityDescription(
         key="simple_plant_todo",
         name="Simple Plant Binary Sensor Todo",
-        # device_class=BinarySensorDeviceClass.MOISTURE,  # noqa: ERA001
         icon="mdi:water-check-outline",
     ),
     BinarySensorEntityDescription(
@@ -33,12 +35,12 @@ ENTITY_DESCRIPTIONS = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config: ConfigEntry,
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the binary_sensor platform."""
     async_add_entities(
-        SimplePlantBinarySensor(hass, config, entity_description)
+        SimplePlantBinarySensor(hass, entry, entity_description)
         for entity_description in ENTITY_DESCRIPTIONS
     )
 
@@ -49,14 +51,21 @@ class SimplePlantBinarySensor(BinarySensorEntity):
     def __init__(
         self,
         _hass: HomeAssistant,
-        _config: ConfigEntry,
+        entry: ConfigEntry,
         description: BinarySensorEntityDescription,
     ) -> None:
         """Initialize the binary_sensor class."""
+        super().__init__()
         self.entity_description = description
-        self._attr_unique_id = f"{description.key}_{_config.title}"
-        self._attr_name = f"{description.key}_{_config.title}"
+        self._attr_unique_id = f"{description.key}_{entry.title}"
+        self._attr_name = f"{description.key}_{entry.title}"
         self._attr_native_value = False
+        # Set up device info
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            name=entry.title,
+            manufacturer=MANUFACTURER,
+        )
 
     @property
     def is_on(self) -> bool:
