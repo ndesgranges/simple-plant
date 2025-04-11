@@ -11,6 +11,7 @@ from homeassistant.components.select import (
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import DOMAIN, HEALTH_OPTIONS, MANUFACTURER
+from .data import SimplePlantStore
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -21,7 +22,6 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     SelectEntityDescription(
         key="simple_plant_health",
-        name="Simple Plant Health",
         icon="mdi:heart-pulse",
         options=HEALTH_OPTIONS,
     ),
@@ -45,24 +45,38 @@ class SimplePlantSelect(SelectEntity):
 
     def __init__(
         self,
-        _hass: HomeAssistant,
+        hass: HomeAssistant,
         entry: ConfigEntry,
         description: SelectEntityDescription,
     ) -> None:
         """Initialize the select class."""
         super().__init__()
         self.entity_description = description
+        self._store = SimplePlantStore(hass)
         self._attr_unique_id = f"{description.key}_{entry.title}"
         self._attr_name = f"{description.key}_{entry.title}"
-        self._attr_current_option = entry.data.get("current_health")
+        self._fallback_value = str(entry.data.get("current_health"))
 
         # Set up device info
+        name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
-            name=entry.title,
+            name=name,
             manufacturer=MANUFACTURER,
         )
 
-    def select_option(self, option: str) -> None:
+    async def async_added_to_hass(self) -> None:
+        """Run when entity is added to hass."""
+        await super().async_added_to_hass()
+        # Load stored data
+        stored_data = await self._store.async_load()
+        if self.unique_id in stored_data:
+            await self.async_select_option(stored_data[self.unique_id])
+        else:
+            await self.async_select_option(self._fallback_value)
+
+    async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
         self._attr_current_option = option
+        # Save to persistent storage
+        await self._store.async_save({self.unique_id: option})

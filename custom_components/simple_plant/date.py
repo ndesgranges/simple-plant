@@ -12,6 +12,7 @@ from homeassistant.components.date import (
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import DOMAIN, MANUFACTURER
+from .data import SimplePlantStore
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -22,7 +23,6 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     DateEntityDescription(
         key="simple_plant_last_watered",
-        name="Simple Plant Last Watered",
         icon="mdi:calendar-check",
     ),
 )
@@ -45,25 +45,50 @@ class SimplePlantDate(DateEntity):
 
     def __init__(
         self,
-        _hass: HomeAssistant,
+        hass: HomeAssistant,
         entry: ConfigEntry,
         description: DateEntityDescription,
     ) -> None:
         """Initialize the date class."""
         super().__init__()
         self.entity_description = description
+        self._store = SimplePlantStore(hass)
         self._attr_unique_id = f"{description.key}_{entry.title}"
         self._attr_name = f"{description.key}_{entry.title}"
-        self._attr_native_value = date.fromisoformat(
-            str(entry.data.get("last_time_watered"))
-        )
+
+        self._fallback_value = self.str2date(str(entry.data.get("last_time_watered")))
+
         # Set up device info
+        name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
-            name=entry.title,
+            name=name,
             manufacturer=MANUFACTURER,
         )
 
-    def set_value(self, value: date) -> None:
+    @staticmethod
+    def str2date(iso_date: str) -> date:
+        """Convert string to date."""
+        return date.fromisoformat(iso_date)
+
+    @staticmethod
+    def date2str(date_obj: date) -> str:
+        """Convert date to str."""
+        return date_obj.isoformat()
+
+    async def async_added_to_hass(self) -> None:
+        """Run when entity is added to hass."""
+        await super().async_added_to_hass()
+        # Load stored data
+        stored_data = await self._store.async_load()
+        if self.unique_id in stored_data:
+            await self.async_set_value(self.str2date(stored_data[self.unique_id]))
+        else:
+            await self.async_set_value(self._fallback_value)
+
+    async def async_set_value(self, value: date) -> None:
         """Change the date."""
         self._attr_native_value = value
+
+        # Save to persistent storage
+        await self._store.async_save({self.unique_id: self.date2str(value)})

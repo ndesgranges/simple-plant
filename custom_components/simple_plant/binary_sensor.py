@@ -35,25 +35,31 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         self.entity_description = description
         self._attr_unique_id = f"{description.key}_{entry.title}"
         self._attr_name = f"{description.key}_{entry.title}"
-        self._attr_native_value = False
+        self._fallback_value = False
+        self._attr_native_value: bool | None = None
         self._hass = hass
         # Set up device info
+        name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
-            name=entry.title,
+            name=name,
             manufacturer=MANUFACTURER,
         )
 
     @property
     def is_on(self) -> bool:
         """Return true if the binary_sensor is on."""
-        return self._attr_native_value
+        return (
+            self._fallback_value
+            if self._attr_native_value is None
+            else self._attr_native_value
+        )
 
     def get_dates(self) -> dict[str, date] | None:
         """Get dates from relevants device entites states."""
         if not self._attr_device_info or "name" not in self._attr_device_info:
             return None
-        device = self._attr_device_info["name"]
+        device = str(self._attr_device_info["name"]).lower()
 
         states_to_get = {
             "last_watered": f"date.{DOMAIN}_last_watered_{device}",
@@ -61,14 +67,18 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         }
 
         # Get states from hass
-        states = {key: self.hass.states.get(eid) for key, eid in states_to_get.items()}
+        data = {key: self.hass.states.get(eid) for key, eid in states_to_get.items()}
 
-        # Verify the data is available
-        for data in states.values():
-            if not data or data == "unavailable":
-                return None
-        # Extract the values
-        states = {key: data.state for key, data in states.items() if data is not None}
+        # Check if all states are available
+        if any(
+            data[key] is None
+            or not data[key].state  # type: ignore noqa: PGH003
+            or data[key].state == "unavailable"  # type: ignore noqa: PGH003
+            for key in states_to_get
+        ):
+            return None
+
+        states = {key: data.state for key, data in data.items() if data is not None}
 
         last_watered_date = date.fromisoformat(states["last_watered"])
         nb_days = float(states["nb_days"])
@@ -84,7 +94,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         await super().async_added_to_hass()
         if not self._attr_device_info or "name" not in self._attr_device_info:
             return
-        device = self._attr_device_info["name"]
+        device = str(self._attr_device_info["name"]).lower()
 
         # Subscribe to state changes
         self.async_on_remove(
@@ -117,8 +127,6 @@ class SimplePlantTodo(SimplePlantBinarySensor):
 
     async def _update_state(self, _event: Event | None = None) -> None:
         """Update the binary sensor state based on other entities."""
-        if not self._attr_device_info or "name" not in self._attr_device_info:
-            return
         dates = self.get_dates()
 
         if not dates:
@@ -133,8 +141,6 @@ class SimplePlantProblem(SimplePlantBinarySensor):
 
     async def _update_state(self, _event: Event | None = None) -> None:
         """Update the binary sensor state based on other entities."""
-        if not self._attr_device_info or "name" not in self._attr_device_info:
-            return
         dates = self.get_dates()
 
         if not dates:

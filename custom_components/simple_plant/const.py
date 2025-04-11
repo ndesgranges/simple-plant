@@ -4,6 +4,8 @@ from logging import Logger, getLogger
 
 from homeassistant.const import Platform
 
+STORAGE_KEY = "simple_plant_data"
+
 LOGGER: Logger = getLogger(__package__)
 
 DOMAIN = "simple_plant"

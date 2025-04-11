@@ -10,9 +10,11 @@ from homeassistant.components.number import (
     NumberEntityDescription,
     NumberMode,
 )
+from homeassistant.const import UnitOfTime
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import DOMAIN, MANUFACTURER
+from .data import SimplePlantStore
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -23,10 +25,10 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     NumberEntityDescription(
         key="simple_plant_days_between_waterings",
-        name="Simple Plant Days Between Waterings",
         device_class=NumberDeviceClass.DURATION,
         mode=NumberMode.BOX,
         icon="mdi:counter",
+        native_unit_of_measurement=UnitOfTime.DAYS,
     ),
 )
 
@@ -55,28 +57,38 @@ class SimplePlantNumber(NumberEntity):
         """Initialize the number class."""
         super().__init__()
         self._hass = hass
+        # self._attr_translation_key = "days_between_waterings"
+        self._store = SimplePlantStore(hass)
         self._entry = entry
         self.entity_description = description
         self._attr_unique_id = f"{description.key}_{entry.title}"
-        self._attr_name = f"{description.key}_{entry.title}"
 
         self._attr_native_min_value = 1
         self._attr_native_max_value = 60
         self._attr_native_step = 1
-        self._attr_native_unit_of_measurement = "days"
 
         self._attr_native_value = entry.data.get("days_between_waterings")
 
         # Set up device info
+        name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
-            name=entry.title,
+            name=name,
             manufacturer=MANUFACTURER,
         )
+
+    async def async_added_to_hass(self) -> None:
+        """Run when entity is added to hass."""
+        await super().async_added_to_hass()
+        # Load stored data
+        stored_data = await self._store.async_load()
+        if self.unique_id in stored_data:
+            self._attr_native_value = stored_data[self.unique_id]
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
         self._attr_native_value = value
-
-        # Trigger state update
         self.async_write_ha_state()
+
+        # Save to persistent storage
+        await self._store.async_save({self.unique_id: value})

@@ -21,7 +21,6 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     ButtonEntityDescription(
         key="simple_plant_mark_watered",
-        name="Simple Plant Mark as watered action",
         icon="mdi:watering-can",
     ),
 )
@@ -54,9 +53,10 @@ class SimplePlantButton(ButtonEntity):
         self._attr_unique_id = f"{description.key}_{entry.title}"
         self._attr_name = f"{description.key}_{entry.title}"
         # Set up device info
+        name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
-            name=entry.title,
+            name=name,
             manufacturer=MANUFACTURER,
         )
 

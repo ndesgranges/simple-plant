@@ -23,7 +23,6 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     ImageEntityDescription(
         key="simple_plant_picture",
-        name="Simple Plant Picture",
         icon="mdi:image",
     ),
 )
@@ -63,9 +62,10 @@ class SimplePlantImage(ImageEntity):
             Path(str(entry.data.get("photo")))
         )
         # Set up device info
+        name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
-            name=entry.title,
+            name=name,
             manufacturer=MANUFACTURER,
         )
 
