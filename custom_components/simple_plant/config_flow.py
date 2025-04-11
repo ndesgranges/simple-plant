@@ -54,9 +54,6 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 )
             file_path = storage_dir / f"{file_id}{suffix}"
 
-            # Copy the uploaded file to your component's directory
-            shutil.copyfile(uploaded_file, file_path)
-
             # Safely copy the file using async operations
             async with aiofiles.open(file_path, "wb") as destination_file:  # noqa: SIM117
                 async with aiofiles.open(uploaded_file, "rb") as source_file:
