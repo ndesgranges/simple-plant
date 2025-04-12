@@ -1,0 +1,102 @@
+"""Number platform for simple_plant."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from homeassistant.components.number import (
+    NumberDeviceClass,
+    NumberEntity,
+    NumberEntityDescription,
+    NumberMode,
+)
+from homeassistant.const import UnitOfTime
+from homeassistant.helpers.device_registry import DeviceInfo
+
+from .const import DOMAIN, MANUFACTURER
+from .data import SimplePlantStore
+
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+
+ENTITY_DESCRIPTIONS = (
+    NumberEntityDescription(
+        key="days_between_waterings",
+        translation_key="days_between_waterings",
+        device_class=NumberDeviceClass.DURATION,
+        mode=NumberMode.BOX,
+        icon="mdi:counter",
+        native_step=0,
+        native_unit_of_measurement=UnitOfTime.DAYS,
+    ),
+)
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up the number platform."""
+    async_add_entities(
+        SimplePlantNumber(hass, entry, entity_description)
+        for entity_description in ENTITY_DESCRIPTIONS
+    )
+
+
+class SimplePlantNumber(NumberEntity):
+    """simple_plant number class."""
+
+    _attr_has_entity_name = True
+    _attr_should_poll = False
+    _attr_native_min_value = 1
+    _attr_native_max_value = 60
+    _attr_native_step = 1
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        entry: ConfigEntry,
+        description: NumberEntityDescription,
+    ) -> None:
+        """Initialize the number class."""
+        super().__init__()
+        self._hass = hass
+        self._store = SimplePlantStore(hass)
+        self._entry = entry
+        self.entity_description = description
+
+        self.entity_id = f"number.{DOMAIN}_{description.key}_{entry.title}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+
+        # set value
+        self._fallback_value = entry.data.get("days_between_waterings")
+
+        # Set up device info
+        name = entry.title[0].upper() + entry.title[1:]
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            name=name,
+            manufacturer=MANUFACTURER,
+        )
+
+    async def async_added_to_hass(self) -> None:
+        """Run when entity is added to hass."""
+        await super().async_added_to_hass()
+        # Load stored data
+        stored_data = await self._store.async_load()
+        if self.unique_id in stored_data:
+            self._attr_native_value = stored_data[self.unique_id]
+        else:
+            self._attr_native_value = self._fallback_value
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update the current value."""
+        self._attr_native_value = value
+        self.async_write_ha_state()
+
+        # Save to persistent storage
+        await self._store.async_save({self.unique_id: value})

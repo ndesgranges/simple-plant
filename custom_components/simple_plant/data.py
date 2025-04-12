@@ -1,25 +1,33 @@
-"""Custom types for simple_plant."""
+"""Storage helper for simple_plant."""
 
-from __future__ import annotations
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.storage import Store
 
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from .const import STORAGE_KEY
 
-if TYPE_CHECKING:
-    from homeassistant.config_entries import ConfigEntry
-    from homeassistant.loader import Integration
-
-    from .api import SimplePlantApiClient
-    from .coordinator import SimplePlantDataUpdateCoordinator
+STORAGE_VERSION = 1
 
 
-type SimplePlantConfigEntry = ConfigEntry[SimplePlantData]
+class SimplePlantStore:
+    """
+    Class to hold simple_plant storage hanlders.
 
+    The goal of such a class it to provide helpers to allow state persistance
+    """
 
-@dataclass
-class SimplePlantData:
-    """Data for the Simple Plant integration."""
+    def __init__(self, hass: HomeAssistant) -> None:
+        """Initialize the storage."""
+        self.hass = hass
+        self.store = Store(hass, STORAGE_VERSION, STORAGE_KEY)
+        self._data = {}
 
-    client: SimplePlantApiClient
-    coordinator: SimplePlantDataUpdateCoordinator
-    integration: Integration
+    async def async_load(self) -> dict:
+        """Load the data from storage."""
+        self._data = await self.store.async_load() or {}
+        return self._data
+
+    async def async_save(self, data: dict) -> None:
+        """Save data to storage."""
+        await self.async_load()
+        self._data.update(data)
+        await self.store.async_save(self._data)

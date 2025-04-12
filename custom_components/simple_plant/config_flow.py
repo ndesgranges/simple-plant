@@ -2,88 +2,111 @@
 
 from __future__ import annotations
 
+from datetime import date
+from pathlib import Path
+
+import aiofiles
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from homeassistant.components.file_upload import process_uploaded_file
 from homeassistant.helpers import selector
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
-from slugify import slugify
 
-from .api import (
-    SimplePlantApiClient,
-    SimplePlantApiClientAuthenticationError,
-    SimplePlantApiClientCommunicationError,
-    SimplePlantApiClientError,
-)
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN, HEALTH_OPTIONS, IMAGES_MIME_TYPES, LOGGER, STORAGE_DIR
 
 
 class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for Simple Plant."""
 
-    VERSION = 1
+    def __init__(self) -> None:
+        """Init."""
+        self._user_inputs: dict = {}
 
     async def async_step_user(
-        self,
-        user_input: dict | None = None,
+        self, user_input: dict | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Handle a flow initialized by the user."""
-        _errors = {}
-        if user_input is not None:
-            try:
-                await self._test_credentials(
-                    username=user_input[CONF_USERNAME],
-                    password=user_input[CONF_PASSWORD],
-                )
-            except SimplePlantApiClientAuthenticationError as exception:
-                LOGGER.warning(exception)
-                _errors["base"] = "auth"
-            except SimplePlantApiClientCommunicationError as exception:
-                LOGGER.error(exception)
-                _errors["base"] = "connection"
-            except SimplePlantApiClientError as exception:
-                LOGGER.exception(exception)
-                _errors["base"] = "unknown"
-            else:
-                await self.async_set_unique_id(
-                    ## Do NOT use this in production code
-                    ## The unique_id should never be something that can change
-                    ## https://developers.home-assistant.io/docs/config_entries_config_flow_handler#unique-ids
-                    unique_id=slugify(user_input[CONF_USERNAME])
-                )
-                self._abort_if_unique_id_configured()
-                return self.async_create_entry(
-                    title=user_input[CONF_USERNAME],
-                    data=user_input,
-                )
+        """
+        Provide Base Plant information Config Flow.
 
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_USERNAME,
-                        default=(user_input or {}).get(CONF_USERNAME, vol.UNDEFINED),
-                    ): selector.TextSelector(
-                        selector.TextSelectorConfig(
-                            type=selector.TextSelectorType.TEXT,
-                        ),
-                    ),
-                    vol.Required(CONF_PASSWORD): selector.TextSelector(
-                        selector.TextSelectorConfig(
-                            type=selector.TextSelectorType.PASSWORD,
-                        ),
-                    ),
-                },
+        1st call = return form to show
+        2nd call = return form with user input
+        """
+        if user_input is None:
+            # 1st call
+            return self.async_show_form(step_id="user", data_schema=user_form())
+        # 2nd call
+        if (
+            "last_watered" in user_input
+            and date.fromisoformat(user_input["last_watered"]) > date.today()  # noqa: DTZ011
+        ):
+            return self.async_show_form(
+                step_id="user",
+                data_schema=user_form(),
+                errors={"base": "invalid_future_date"},
+            )
+        if "photo" not in user_input:
+            return self.async_show_form(
+                step_id="user",
+                errors={"base": "upload_failed_generic"},
+            )
+        file_id = user_input["photo"]
+
+        with process_uploaded_file(self.hass, file_id) as uploaded_file:
+            # Save the file
+            storage_dir = Path(self.hass.config.path("local", STORAGE_DIR))
+            storage_dir.mkdir(parents=True, exist_ok=True)
+
+            suffix = uploaded_file.suffix
+            if suffix not in IMAGES_MIME_TYPES:
+                return self.async_show_form(
+                    step_id="user",
+                    errors={"base": "upload_failed_type"},
+                )
+            file_path = storage_dir / f"{file_id}{suffix}"
+
+            # Safely copy the file using async operations
+            async with aiofiles.open(file_path, "wb") as destination_file:  # noqa: SIM117
+                async with aiofiles.open(uploaded_file, "rb") as source_file:
+                    await destination_file.write(await source_file.read())
+
+            # store path
+            relative_path = f"/local/{STORAGE_DIR}/{file_path.name}"
+            user_input["photo"] = relative_path
+
+            return self.async_create_entry(title=user_input["name"], data=user_input)
+        return self.async_create_entry(title=user_input["name"], data=user_input)
+
+
+def user_form() -> vol.Schema:
+    """Return a new device form."""
+    LOGGER.debug("config_flow, 1st call : displaying form")
+    return vol.Schema(
+        {
+            vol.Required("name"): selector.TextSelector(
+                selector.TextSelectorConfig(multiline=False, multiple=False)
             ),
-            errors=_errors,
-        )
-
-    async def _test_credentials(self, username: str, password: str) -> None:
-        """Validate credentials."""
-        client = SimplePlantApiClient(
-            username=username,
-            password=password,
-            session=async_create_clientsession(self.hass),
-        )
-        await client.async_get_data()
+            vol.Required("last_watered"): selector.DateSelector(
+                selector.DateSelectorConfig(),
+            ),
+            vol.Required("days_between_waterings"): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=1,
+                    max=60,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="days",
+                ),
+            ),
+            vol.Required("health"): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    {
+                        "options": HEALTH_OPTIONS,
+                        "custom_value": False,
+                        "sort": False,
+                    }
+                )
+            ),
+            vol.Optional("comment", default=""): str,
+            vol.Required("photo"): selector.FileSelector(
+                selector.FileSelectorConfig(accept="image/*")
+            ),
+        }
+    )
