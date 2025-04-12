@@ -53,10 +53,11 @@ class SimplePlantImage(ImageEntity):
         super().__init__(hass)
         self.entity_description = description
         self._attr_unique_id = f"{description.key}_{entry.title}"
-        self._attr_name = f"{description.key}_{entry.title}"
         self._attr_image_url = hass.config.path(
             str(entry.data.get("photo")).lstrip("/")
         )
+        self._attr_translation_key = "picture"
+        self.has_entity_name = True
 
         self._attr_content_type = self._get_content_type(
             Path(str(entry.data.get("photo")))

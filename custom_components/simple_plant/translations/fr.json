@@ -14,12 +14,67 @@
             }
         },
         "error": {
+            "invalid_future_date": "Impossible de définir une date d'arrosage dans le futur.",
             "upload_failed_generic": "File upload failed, soomething went wrong.",
             "upload_failed_type": "File upload failed, the file type is not a supported image type.",
             "unknown": "Unknown error occurred."
         },
         "abort": {
             "already_configured": "This entry is already configured."
+        }
+    },
+    "entity": {
+        "button": {
+            "mark_watered": {
+                "name": "Arroser",
+                "description": "Marquer la plante comme arrosée aujourd'hui."
+            }
+        },
+        "binary_sensor": {
+            "todo": {
+                "name": "À arroser",
+                "description": "La plante à besoin d'être arrosée."
+            },
+            "problem": {
+                "name": "Retard d'arrosage",
+                "description": "Retard sur le planning d'arrosage"
+            }
+        },
+        "date": {
+            "last_watered": {
+                "name": "Dernier arrosage",
+                "description": "Date du dernier arrosage."
+            }
+        },
+        "image": {
+            "picture": {
+                "name": "Image",
+                "description": "La frimousse de votre plante."
+            }
+        },
+        "number": {
+            "days_between_waterings": {
+                "name": "Jours entre chaque arrosage"
+            }
+        },
+        "select": {
+            "health": {
+                "name": "Santé",
+                "description": "Santé actuelle de la plante.",
+                "state": {
+                    "notset": "Non défini",
+                    "poor": "Mal-en-point",
+                    "fair": "Fébrile",
+                    "good": "Stable",
+                    "verygood": "En forme",
+                    "excellent": "Rayonnante"
+                }
+            }
+        }
+    },
+    "exceptions": {
+        "invalid_future_date": {
+            "message": "Impossible de définir une date d'arrosage dans le futur."
         }
     }
 }

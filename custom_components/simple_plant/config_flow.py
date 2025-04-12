@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 import aiofiles
@@ -33,10 +34,19 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             # 1st call
             return self.async_show_form(step_id="user", data_schema=user_form())
         # 2nd call
+        if (
+            "last_time_watered" in user_input
+            and date.fromisoformat(user_input["last_time_watered"]) > date.today()  # noqa: DTZ011
+        ):
+            return self.async_show_form(
+                step_id="user",
+                data_schema=user_form(),
+                errors={"base": "invalid_future_date"},
+            )
         if "photo" not in user_input:
             return self.async_show_form(
-                step_id="photo",
-                errors={"upload_failed_generic": "File upload failed"},
+                step_id="user",
+                errors={"base": "upload_failed_generic"},
             )
         file_id = user_input["photo"]
 
@@ -48,8 +58,8 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             suffix = uploaded_file.suffix
             if suffix not in IMAGES_MIME_TYPES:
                 return self.async_show_form(
-                    step_id="photo",
-                    errors={"upload_failed_type": "Invalid file type"},
+                    step_id="user",
+                    errors={"base": "upload_failed_type"},
                 )
             file_path = storage_dir / f"{file_id}{suffix}"
 

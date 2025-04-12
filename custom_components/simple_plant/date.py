@@ -9,6 +9,7 @@ from homeassistant.components.date import (
     DateEntity,
     DateEntityDescription,
 )
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import DOMAIN, MANUFACTURER
@@ -54,7 +55,8 @@ class SimplePlantDate(DateEntity):
         self.entity_description = description
         self._store = SimplePlantStore(hass)
         self._attr_unique_id = f"{description.key}_{entry.title}"
-        self._attr_name = f"{description.key}_{entry.title}"
+        self._attr_translation_key = "last_watered"
+        self.has_entity_name = True
 
         self._fallback_value = self.str2date(str(entry.data.get("last_time_watered")))
 
@@ -88,6 +90,14 @@ class SimplePlantDate(DateEntity):
 
     async def async_set_value(self, value: date) -> None:
         """Change the date."""
+        # Validate the date is not in the future
+        if value > date.today():  # noqa: DTZ011
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="invalid_future_date",
+                translation_placeholders={},
+            )
+
         self._attr_native_value = value
 
         # Save to persistent storage

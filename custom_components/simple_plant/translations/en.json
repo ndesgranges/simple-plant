@@ -14,12 +14,67 @@
             }
         },
         "error": {
+            "invalid_future_date": "Cannot set watering date in the future.",
             "upload_failed_generic": "File upload failed, soomething went wrong.",
             "upload_failed_type": "File upload failed, the file type is not a supported image type.",
             "unknown": "Unknown error occurred."
         },
         "abort": {
             "already_configured": "This entry is already configured."
+        }
+    },
+    "entity": {
+        "button": {
+            "mark_watered": {
+                "name": "Mark watered",
+                "description": "Mark the plant as watered today."
+            }
+        },
+        "binary_sensor": {
+            "todo": {
+                "name": "To Water",
+                "description": "The plant needs to be watered."
+            },
+            "problem": {
+                "name": "Late Watering",
+                "description": "Late on watering scheadule."
+            }
+        },
+        "date": {
+            "last_watered": {
+                "name": "Last time watered",
+                "description": "Last time the plant was watered."
+            }
+        },
+        "image": {
+            "picture": {
+                "name": "Picture",
+                "description": "Nice picture of your plant."
+            }
+        },
+        "number": {
+            "days_between_waterings": {
+                "name": "Days between waterings"
+            }
+        },
+        "select": {
+            "health": {
+                "name": "Current health",
+                "description": "Current health of the plant.",
+                "state": {
+                    "notset": "Not Set",
+                    "poor": "Poor",
+                    "fair": "Fair",
+                    "good": "Good",
+                    "verygood": "Very Good",
+                    "excellent": "Excellent"
+                }
+            }
+        }
+    },
+    "exceptions": {
+        "invalid_future_date": {
+            "message": "Cannot set watering date in the future."
         }
     }
 }

@@ -13,7 +13,7 @@ from homeassistant.components.number import (
 from homeassistant.const import UnitOfTime
 from homeassistant.helpers.device_registry import DeviceInfo
 
-from .const import DOMAIN, MANUFACTURER
+from .const import DOMAIN, LOGGER, MANUFACTURER
 from .data import SimplePlantStore
 
 if TYPE_CHECKING:
@@ -28,6 +28,7 @@ ENTITY_DESCRIPTIONS = (
         device_class=NumberDeviceClass.DURATION,
         mode=NumberMode.BOX,
         icon="mdi:counter",
+        native_step=0,
         native_unit_of_measurement=UnitOfTime.DAYS,
     ),
 )
@@ -57,11 +58,17 @@ class SimplePlantNumber(NumberEntity):
         """Initialize the number class."""
         super().__init__()
         self._hass = hass
-        # self._attr_translation_key = "days_between_waterings"
+        self._attr_translation_key = "days_between_waterings"
+        self.has_entity_name = True
         self._store = SimplePlantStore(hass)
         self._entry = entry
         self.entity_description = description
         self._attr_unique_id = f"{description.key}_{entry.title}"
+
+        LOGGER.debug(
+            "simple_plant number entity created: %s",
+            self._attr_unique_id,
+        )
 
         self._attr_native_min_value = 1
         self._attr_native_max_value = 60

@@ -34,10 +34,10 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         super().__init__()
         self.entity_description = description
         self._attr_unique_id = f"{description.key}_{entry.title}"
-        self._attr_name = f"{description.key}_{entry.title}"
         self._fallback_value = False
         self._attr_native_value: bool | None = None
         self._hass = hass
+        self.has_entity_name = True
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
@@ -125,6 +125,16 @@ class SimplePlantBinarySensor(BinarySensorEntity):
 class SimplePlantTodo(SimplePlantBinarySensor):
     """simple_plant binary_sensor for todo."""
 
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        entry: ConfigEntry,
+        description: BinarySensorEntityDescription,
+    ) -> None:
+        """Initialize the todo class."""
+        super().__init__(hass, entry, description)
+        self._attr_translation_key = "todo"
+
     async def _update_state(self, _event: Event | None = None) -> None:
         """Update the binary sensor state based on other entities."""
         dates = self.get_dates()
@@ -137,7 +147,17 @@ class SimplePlantTodo(SimplePlantBinarySensor):
 
 
 class SimplePlantProblem(SimplePlantBinarySensor):
-    """simple_plant binary_sensor for todo."""
+    """simple_plant binary_sensor for problem."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        entry: ConfigEntry,
+        description: BinarySensorEntityDescription,
+    ) -> None:
+        """Initialize the problem class."""
+        super().__init__(hass, entry, description)
+        self._attr_translation_key = "problem"
 
     async def _update_state(self, _event: Event | None = None) -> None:
         """Update the binary sensor state based on other entities."""

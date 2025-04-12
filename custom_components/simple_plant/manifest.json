@@ -1,6 +1,7 @@
 {
     "domain": "simple_plant",
     "name": "Simple Plant",
+    "integration_type": "device",
     "codeowners": [
         "@ndesgranges"
     ],
