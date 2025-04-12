@@ -5,10 +5,10 @@
                 "description": "Provide base information for your new plant. If you need help with the configuration have a look here: https://github.com/ndesgranges/simple-plant",
                 "data": {
                     "name": "Name",
-                    "last_time_watered": "Last time watered",
+                    "last_watered": "Last time watered",
                     "days_between_waterings": "Days between watering",
                     "photo": "Photo",
-                    "current_health": "Current health",
+                    "health": "Current health",
                     "comment": "Comment"
                 }
             }

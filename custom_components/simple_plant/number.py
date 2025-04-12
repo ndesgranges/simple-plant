@@ -24,7 +24,8 @@ if TYPE_CHECKING:
 
 ENTITY_DESCRIPTIONS = (
     NumberEntityDescription(
-        key="simple_plant_days_between_waterings",
+        key="days_between_waterings",
+        translation_key="days_between_waterings",
         device_class=NumberDeviceClass.DURATION,
         mode=NumberMode.BOX,
         icon="mdi:counter",
@@ -49,6 +50,12 @@ async def async_setup_entry(
 class SimplePlantNumber(NumberEntity):
     """simple_plant number class."""
 
+    _attr_has_entity_name = True
+    _attr_should_poll = False
+    _attr_native_min_value = 1
+    _attr_native_max_value = 60
+    _attr_native_step = 1
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -58,23 +65,15 @@ class SimplePlantNumber(NumberEntity):
         """Initialize the number class."""
         super().__init__()
         self._hass = hass
-        self._attr_translation_key = "days_between_waterings"
-        self.has_entity_name = True
         self._store = SimplePlantStore(hass)
         self._entry = entry
         self.entity_description = description
-        self._attr_unique_id = f"{description.key}_{entry.title}"
 
-        LOGGER.debug(
-            "simple_plant number entity created: %s",
-            self._attr_unique_id,
-        )
+        self.entity_id = f"number.{DOMAIN}_{description.key}_{entry.title}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
 
-        self._attr_native_min_value = 1
-        self._attr_native_max_value = 60
-        self._attr_native_step = 1
-
-        self._attr_native_value = entry.data.get("days_between_waterings")
+        # set value
+        self._fallback_value = entry.data.get("days_between_waterings")
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
@@ -91,11 +90,15 @@ class SimplePlantNumber(NumberEntity):
         stored_data = await self._store.async_load()
         if self.unique_id in stored_data:
             self._attr_native_value = stored_data[self.unique_id]
+        else:
+            self._attr_native_value = self._fallback_value
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
         self._attr_native_value = value
         self.async_write_ha_state()
+
+        LOGGER.debug("%s : NEW VALUE: %s", self.entity_id, value)
 
         # Save to persistent storage
         await self._store.async_save({self.unique_id: value})

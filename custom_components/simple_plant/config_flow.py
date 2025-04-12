@@ -35,8 +35,8 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_show_form(step_id="user", data_schema=user_form())
         # 2nd call
         if (
-            "last_time_watered" in user_input
-            and date.fromisoformat(user_input["last_time_watered"]) > date.today()  # noqa: DTZ011
+            "last_watered" in user_input
+            and date.fromisoformat(user_input["last_watered"]) > date.today()  # noqa: DTZ011
         ):
             return self.async_show_form(
                 step_id="user",
@@ -84,7 +84,7 @@ def user_form() -> vol.Schema:
             vol.Required("name"): selector.TextSelector(
                 selector.TextSelectorConfig(multiline=False, multiple=False)
             ),
-            vol.Required("last_time_watered"): selector.DateSelector(
+            vol.Required("last_watered"): selector.DateSelector(
                 selector.DateSelectorConfig(),
             ),
             vol.Required("days_between_waterings"): selector.NumberSelector(
@@ -95,7 +95,7 @@ def user_form() -> vol.Schema:
                     unit_of_measurement="days",
                 ),
             ),
-            vol.Required("current_health"): selector.SelectSelector(
+            vol.Required("health"): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     {
                         "options": HEALTH_OPTIONS,

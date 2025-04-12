@@ -22,7 +22,8 @@ if TYPE_CHECKING:
 
 ENTITY_DESCRIPTIONS = (
     ImageEntityDescription(
-        key="simple_plant_picture",
+        key="picture",
+        translation_key="picture",
         icon="mdi:image",
     ),
 )
@@ -43,6 +44,8 @@ async def async_setup_entry(
 class SimplePlantImage(ImageEntity):
     """simple_plant image class."""
 
+    _attr_has_entity_name = True
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -52,16 +55,15 @@ class SimplePlantImage(ImageEntity):
         """Initialize the image class."""
         super().__init__(hass)
         self.entity_description = description
-        self._attr_unique_id = f"{description.key}_{entry.title}"
-        self._attr_image_url = hass.config.path(
-            str(entry.data.get("photo")).lstrip("/")
-        )
-        self._attr_translation_key = "picture"
-        self.has_entity_name = True
 
-        self._attr_content_type = self._get_content_type(
-            Path(str(entry.data.get("photo")))
-        )
+        image_path = str(entry.data.get("photo"))
+        self._attr_image_url = hass.config.path(image_path.lstrip("/"))
+
+        self._attr_content_type = self._get_content_type(Path(image_path))
+
+        self.entity_id = f"image.{DOMAIN}_{description.key}_{entry.title}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(

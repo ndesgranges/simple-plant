@@ -21,7 +21,8 @@ if TYPE_CHECKING:
 
 ENTITY_DESCRIPTIONS = (
     SelectEntityDescription(
-        key="simple_plant_health",
+        key="health",
+        translation_key="health",
         icon="mdi:heart-pulse",
         options=HEALTH_OPTIONS,
     ),
@@ -43,6 +44,8 @@ async def async_setup_entry(
 class SimplePlantSelect(SelectEntity):
     """simple_plant select class."""
 
+    _attr_has_entity_name = True
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -51,12 +54,12 @@ class SimplePlantSelect(SelectEntity):
     ) -> None:
         """Initialize the select class."""
         super().__init__()
-        self.entity_description = description
         self._store = SimplePlantStore(hass)
-        self._attr_unique_id = f"{description.key}_{entry.title}"
-        self._fallback_value = str(entry.data.get("current_health"))
-        self._attr_translation_key = "health"
-        self.has_entity_name = True
+        self.entity_description = description
+        self._fallback_value = str(entry.data.get("health"))
+
+        self.entity_id = f"select.{DOMAIN}_{description.key}_{entry.title}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]

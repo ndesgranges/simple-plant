@@ -5,10 +5,10 @@
                 "description": "Informations de base de votre plante. Si vous avez besoin d'aide, allez jeter un oeil ici : https://github.com/ndesgranges/simple-plant",
                 "data": {
                     "name": "Nom",
-                    "last_time_watered": "Dernier arrosage",
+                    "last_watered": "Dernier arrosage",
                     "days_between_waterings": "Nombre de jours entre chaque arrosage",
                     "photo": "Photo",
-                    "current_health": "Santé actuelle",
+                    "health": "Santé actuelle",
                     "comment": "Commentaire"
                 }
             }

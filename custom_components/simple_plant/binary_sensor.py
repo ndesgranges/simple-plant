@@ -13,7 +13,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.event import async_track_state_change_event
 
-from .const import DOMAIN, MANUFACTURER
+from .const import DOMAIN, LOGGER, MANUFACTURER
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -24,6 +24,9 @@ if TYPE_CHECKING:
 class SimplePlantBinarySensor(BinarySensorEntity):
     """simple_plant binary_sensor base class."""
 
+    _attr_has_entity_name = True
+    _fallback_value: bool
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -32,12 +35,14 @@ class SimplePlantBinarySensor(BinarySensorEntity):
     ) -> None:
         """Initialize the binary_sensor class."""
         super().__init__()
-        self.entity_description = description
-        self._attr_unique_id = f"{description.key}_{entry.title}"
-        self._fallback_value = False
-        self._attr_native_value: bool | None = None
         self._hass = hass
-        self.has_entity_name = True
+        self.entity_description = description
+
+        self._attr_native_value: bool | None = None
+
+        self.entity_id = f"binary_sensor.{DOMAIN}_{description.key}_{entry.title}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
@@ -76,6 +81,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
             or data[key].state == "unavailable"  # type: ignore noqa: PGH003
             for key in states_to_get
         ):
+            LOGGER.warning("%s: Couldn't get all states", self.unique_id)
             return None
 
         states = {key: data.state for key, data in data.items() if data is not None}
@@ -125,15 +131,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
 class SimplePlantTodo(SimplePlantBinarySensor):
     """simple_plant binary_sensor for todo."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        description: BinarySensorEntityDescription,
-    ) -> None:
-        """Initialize the todo class."""
-        super().__init__(hass, entry, description)
-        self._attr_translation_key = "todo"
+    _fallback_value = False
 
     async def _update_state(self, _event: Event | None = None) -> None:
         """Update the binary sensor state based on other entities."""
@@ -149,15 +147,8 @@ class SimplePlantTodo(SimplePlantBinarySensor):
 class SimplePlantProblem(SimplePlantBinarySensor):
     """simple_plant binary_sensor for problem."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        description: BinarySensorEntityDescription,
-    ) -> None:
-        """Initialize the problem class."""
-        super().__init__(hass, entry, description)
-        self._attr_translation_key = "problem"
+    _fallback_value = False
+    _attr_translation_key = "problem"
 
     async def _update_state(self, _event: Event | None = None) -> None:
         """Update the binary sensor state based on other entities."""
@@ -174,7 +165,8 @@ ENTITIES = [
     {
         "class": SimplePlantTodo,
         "description": BinarySensorEntityDescription(
-            key="simple_plant_todo",
+            key="todo",
+            translation_key="todo",
             name="Simple Plant Binary Sensor Todo",
             icon="mdi:water-check-outline",
         ),
@@ -182,7 +174,8 @@ ENTITIES = [
     {
         "class": SimplePlantProblem,
         "description": BinarySensorEntityDescription(
-            key="simple_plant_problem",
+            key="problem",
+            translation_key="problem",
             name="Simple Plant Binary Sensor Problem",
             device_class=BinarySensorDeviceClass.PROBLEM,
             icon="mdi:water-alert-outline",

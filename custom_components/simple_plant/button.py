@@ -20,7 +20,8 @@ if TYPE_CHECKING:
 
 ENTITY_DESCRIPTIONS = (
     ButtonEntityDescription(
-        key="simple_plant_mark_watered",
+        key="mark_watered",
+        translation_key="mark_watered",
         icon="mdi:watering-can",
     ),
 )
@@ -41,6 +42,8 @@ async def async_setup_entry(
 class SimplePlantButton(ButtonEntity):
     """simple_plant button class."""
 
+    _attr_has_entity_name = True
+
     def __init__(
         self,
         _hass: HomeAssistant,
@@ -50,9 +53,10 @@ class SimplePlantButton(ButtonEntity):
         """Initialize the button class."""
         super().__init__()
         self.entity_description = description
-        self._attr_unique_id = f"{description.key}_{entry.title}"
-        self._attr_translation_key = "mark_watered"
-        self.has_entity_name = True
+
+        self.entity_id = f"button.{DOMAIN}_{description.key}_{entry.title}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(

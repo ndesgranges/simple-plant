@@ -23,7 +23,8 @@ if TYPE_CHECKING:
 
 ENTITY_DESCRIPTIONS = (
     DateEntityDescription(
-        key="simple_plant_last_watered",
+        key="last_watered",
+        translation_key="last_watered",
         icon="mdi:calendar-check",
     ),
 )
@@ -44,6 +45,8 @@ async def async_setup_entry(
 class SimplePlantDate(DateEntity):
     """simple_plant date class."""
 
+    _attr_has_entity_name = True
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -52,13 +55,13 @@ class SimplePlantDate(DateEntity):
     ) -> None:
         """Initialize the date class."""
         super().__init__()
-        self.entity_description = description
         self._store = SimplePlantStore(hass)
-        self._attr_unique_id = f"{description.key}_{entry.title}"
-        self._attr_translation_key = "last_watered"
-        self.has_entity_name = True
+        self.entity_description = description
 
-        self._fallback_value = self.str2date(str(entry.data.get("last_time_watered")))
+        self._fallback_value = self.str2date(str(entry.data.get("last_watered")))
+
+        self.entity_id = f"date.{DOMAIN}_{description.key}_{entry.title}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
