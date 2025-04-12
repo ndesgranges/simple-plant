@@ -55,7 +55,6 @@ class SimplePlantDate(DateEntity):
     ) -> None:
         """Initialize the date class."""
         super().__init__()
-        self._store = SimplePlantStore(hass)
         self.entity_description = description
 
         self._fallback_value = self.str2date(str(entry.data.get("last_watered")))
@@ -70,6 +69,7 @@ class SimplePlantDate(DateEntity):
             name=name,
             manufacturer=MANUFACTURER,
         )
+        self._store = SimplePlantStore(hass, str(self.device))
 
     @staticmethod
     def str2date(iso_date: str) -> date:
@@ -80,6 +80,13 @@ class SimplePlantDate(DateEntity):
     def date2str(date_obj: date) -> str:
         """Convert date to str."""
         return date_obj.isoformat()
+
+    @property
+    def device(self) -> str | None:
+        """Return the device name."""
+        if not self._attr_device_info or "name" not in self._attr_device_info:
+            return None
+        return str(self._attr_device_info["name"]).lower()
 
     async def async_added_to_hass(self) -> None:
         """Run when entity is added to hass."""

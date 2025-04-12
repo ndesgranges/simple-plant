@@ -54,7 +54,6 @@ class SimplePlantSelect(SelectEntity):
     ) -> None:
         """Initialize the select class."""
         super().__init__()
-        self._store = SimplePlantStore(hass)
         self.entity_description = description
         self._fallback_value = str(entry.data.get("health"))
 
@@ -68,6 +67,14 @@ class SimplePlantSelect(SelectEntity):
             name=name,
             manufacturer=MANUFACTURER,
         )
+        self._store = SimplePlantStore(hass, str(self.device))
+
+    @property
+    def device(self) -> str | None:
+        """Return the device name."""
+        if not self._attr_device_info or "name" not in self._attr_device_info:
+            return None
+        return str(self._attr_device_info["name"]).lower()
 
     async def async_added_to_hass(self) -> None:
         """Run when entity is added to hass."""

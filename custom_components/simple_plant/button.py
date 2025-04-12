@@ -65,6 +65,13 @@ class SimplePlantButton(ButtonEntity):
             manufacturer=MANUFACTURER,
         )
 
+    @property
+    def device(self) -> str | None:
+        """Return the device name."""
+        if not self._attr_device_info or "name" not in self._attr_device_info:
+            return None
+        return str(self._attr_device_info["name"]).lower()
+
     def press(self) -> None:
         """Press the button."""
         raise NotImplementedError
