@@ -13,7 +13,7 @@ from homeassistant.components.number import (
 from homeassistant.const import UnitOfTime
 from homeassistant.helpers.device_registry import DeviceInfo
 
-from .const import DOMAIN, LOGGER, MANUFACTURER
+from .const import DOMAIN, MANUFACTURER
 from .data import SimplePlantStore
 
 if TYPE_CHECKING:
@@ -97,8 +97,6 @@ class SimplePlantNumber(NumberEntity):
         """Update the current value."""
         self._attr_native_value = value
         self.async_write_ha_state()
-
-        LOGGER.debug("%s : NEW VALUE: %s", self.entity_id, value)
 
         # Save to persistent storage
         await self._store.async_save({self.unique_id: value})

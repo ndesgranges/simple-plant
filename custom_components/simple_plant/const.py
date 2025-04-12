@@ -37,7 +37,6 @@ IMAGES_MIME_TYPES = {
 PLATFORMS: list[Platform] = [
     Platform.BUTTON,
     Platform.BINARY_SENSOR,
-    Platform.BINARY_SENSOR,
     Platform.DATE,
     Platform.IMAGE,
     Platform.NUMBER,
