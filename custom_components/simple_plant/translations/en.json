@@ -26,30 +26,25 @@
     "entity": {
         "button": {
             "mark_watered": {
-                "name": "Mark watered",
-                "description": "Mark the plant as watered today."
+                "name": "Mark watered"
             }
         },
         "binary_sensor": {
             "todo": {
-                "name": "To Water",
-                "description": "The plant needs to be watered."
+                "name": "To Water"
             },
             "problem": {
-                "name": "Late Watering",
-                "description": "Late on watering scheadule."
+                "name": "Late Watering"
             }
         },
         "date": {
             "last_watered": {
-                "name": "Last time watered",
-                "description": "Last time the plant was watered."
+                "name": "Last time watered"
             }
         },
         "image": {
             "picture": {
-                "name": "Picture",
-                "description": "Nice picture of your plant."
+                "name": "Picture"
             }
         },
         "number": {
@@ -60,7 +55,6 @@
         "select": {
             "health": {
                 "name": "Current health",
-                "description": "Current health of the plant.",
                 "state": {
                     "notset": "Not Set",
                     "poor": "Poor",
