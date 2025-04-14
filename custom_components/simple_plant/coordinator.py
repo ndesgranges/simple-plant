@@ -58,9 +58,41 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
         )
         await self.async_refresh()
 
-    async def async_action_mark_as_watered(self) -> None:
+    async def async_mark_as_watered_toggle(self) -> None:
+        """Toggle last watered between old value and today."""
+        data = await self.store.async_get_data(self.device)
+        if data is None:
+            LOGGER.warning("%s: No data found in storage", self.device)
+            return
+
+        last_watered = None
+        old_last_watered = None
+        if "last_watered" in data:
+            last_watered = date.fromisoformat(data["last_watered"])
+        if "_old_last_watered" in data:
+            old_last_watered = date.fromisoformat(data["_old_last_watered"])
+
+        if last_watered and last_watered != date.today():  # noqa: DTZ011
+            await self.async_action_mark_as_watered(save_old=last_watered)
+        else:
+            await self.async_action_cancel_mark_as_watered(old_value=old_last_watered)
+
+    async def async_action_cancel_mark_as_watered(
+        self, old_value: date | None = None
+    ) -> None:
+        """Update last watered date to old value."""
+        if old_value:
+            await self.async_set_last_watered(old_value)
+        else:
+            await self.async_action_mark_as_watered()
+
+    async def async_action_mark_as_watered(self, save_old: date | None = None) -> None:
         """Update last watered date today."""
         today = date.today()  # noqa: DTZ011
+        if save_old:
+            await self.store.async_save_data(
+                self.device, {"_old_last_watered": save_old.isoformat()}
+            )
         await self.async_set_last_watered(today)
 
     def get_dates(self) -> dict[str, date] | None:

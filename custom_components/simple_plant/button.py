@@ -75,4 +75,4 @@ class SimplePlantButton(ButtonEntity):
 
     async def async_press(self) -> None:
         """Press the button."""
-        await self.coordinator.async_action_mark_as_watered()
+        await self.coordinator.async_mark_as_watered_toggle()
