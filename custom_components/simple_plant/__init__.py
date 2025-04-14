@@ -10,6 +10,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from homeassistant.helpers.config_validation import config_entry_only_config_schema
+
 from .const import DOMAIN, LOGGER, PLATFORMS
 from .coordinator import SimplePlantCoordinator
 
@@ -17,6 +19,9 @@ if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.typing import ConfigType
+
+
+CONFIG_SCHEMA = config_entry_only_config_schema(DOMAIN)
 
 
 async def async_setup(hass: HomeAssistant, _config: ConfigType) -> bool:
