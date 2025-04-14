@@ -46,13 +46,14 @@ class SimplePlantButton(ButtonEntity):
 
     def __init__(
         self,
-        _hass: HomeAssistant,
+        hass: HomeAssistant,
         entry: ConfigEntry,
         description: ButtonEntityDescription,
     ) -> None:
         """Initialize the button class."""
         super().__init__()
         self.entity_description = description
+        self.coordinator = hass.data[DOMAIN][entry.entry_id]
 
         self.entity_id = f"button.{DOMAIN}_{description.key}_{entry.title}"
         self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
@@ -65,6 +66,13 @@ class SimplePlantButton(ButtonEntity):
             manufacturer=MANUFACTURER,
         )
 
-    def press(self) -> None:
+    @property
+    def device(self) -> str | None:
+        """Return the device name."""
+        if not self._attr_device_info or "name" not in self._attr_device_info:
+            return None
+        return str(self._attr_device_info["name"]).lower()
+
+    async def async_press(self) -> None:
         """Press the button."""
-        raise NotImplementedError
+        await self.coordinator.async_action_mark_as_watered()

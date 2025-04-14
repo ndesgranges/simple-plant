@@ -72,6 +72,13 @@ class SimplePlantImage(ImageEntity):
             manufacturer=MANUFACTURER,
         )
 
+    @property
+    def device(self) -> str | None:
+        """Return the device name."""
+        if not self._attr_device_info or "name" not in self._attr_device_info:
+            return None
+        return str(self._attr_device_info["name"]).lower()
+
     def _get_content_type(self, path: Path) -> str:
         """Get the content type of the image based on its extension."""
         if path.suffix in IMAGES_MIME_TYPES:
