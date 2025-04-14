@@ -35,3 +35,10 @@ class SimplePlantStore:
         LOGGER.debug("Storing following data to device %s : %s", self.device, data)
         self._data[self.device] = device_data
         await self.store.async_save(self._data)
+
+    async def async_remove_device(self) -> None:
+        """Remove device data from storage."""
+        await self.async_load()
+        if self.device in self._data:
+            del self._data[self.device]
+            await self.store.async_save(self._data)

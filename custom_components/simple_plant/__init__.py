@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .const import DOMAIN, LOGGER, PLATFORMS
+from .coordinator import SimplePlantCoordinator
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -27,7 +28,10 @@ async def async_setup(hass: HomeAssistant, _config: ConfigType) -> bool:
 # https://developers.home-assistant.io/docs/config_entries_index/#setting-up-an-entry
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
-    hass.data[DOMAIN][entry.entry_id] = entry.data
+    coordinator = SimplePlantCoordinator(hass, entry)
+    await coordinator.async_config_entry_first_refresh()
+
+    hass.data[DOMAIN][entry.entry_id] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
@@ -49,6 +53,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle removal of an entry."""
+    # Remove storage
+    coordinator = SimplePlantCoordinator(hass, entry)
+    await coordinator.remove_device_from_storage()
+
+    # Remove photo
     try:
         # Get the photo path from the entry's data
         photo_path = entry.data.get("photo")

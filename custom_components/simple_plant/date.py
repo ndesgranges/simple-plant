@@ -9,11 +9,11 @@ from homeassistant.components.date import (
     DateEntity,
     DateEntityDescription,
 )
-from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, MANUFACTURER
-from .data import SimplePlantStore
+from .coordinator import SimplePlantCoordinator
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -42,7 +42,7 @@ async def async_setup_entry(
     )
 
 
-class SimplePlantDate(DateEntity):
+class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):
     """simple_plant date class."""
 
     _attr_has_entity_name = True
@@ -54,7 +54,8 @@ class SimplePlantDate(DateEntity):
         description: DateEntityDescription,
     ) -> None:
         """Initialize the date class."""
-        super().__init__()
+        coordinator = hass.data[DOMAIN][entry.entry_id]
+        super().__init__(coordinator)
         self.entity_description = description
 
         self._fallback_value = self.str2date(str(entry.data.get("last_watered")))
@@ -69,7 +70,6 @@ class SimplePlantDate(DateEntity):
             name=name,
             manufacturer=MANUFACTURER,
         )
-        self._store = SimplePlantStore(hass, str(self.device))
 
     @staticmethod
     def str2date(iso_date: str) -> date:
@@ -91,24 +91,22 @@ class SimplePlantDate(DateEntity):
     async def async_added_to_hass(self) -> None:
         """Run when entity is added to hass."""
         await super().async_added_to_hass()
-        # Load stored data
-        stored_data = await self._store.async_load()
-        if self.unique_id in stored_data:
-            await self.async_set_value(self.str2date(stored_data[self.unique_id]))
-        else:
+        if not self.native_value:
             await self.async_set_value(self._fallback_value)
 
     async def async_set_value(self, value: date) -> None:
         """Change the date."""
         # Validate the date is not in the future
-        if value > date.today():  # noqa: DTZ011
-            raise ServiceValidationError(
-                translation_domain=DOMAIN,
-                translation_key="invalid_future_date",
-                translation_placeholders={},
-            )
+        await self.coordinator.async_set_last_watered(value)
 
-        self._attr_native_value = value
+    @property
+    def native_value(self) -> date | None:
+        """Return the date value."""
+        if not self.coordinator.data:
+            return None
 
-        # Save to persistent storage
-        await self._store.async_save({self.unique_id: self.date2str(value)})
+        date_str = self.coordinator.data.get("last_watered")
+        if not date_str:
+            return None
+
+        return date.fromisoformat(date_str)

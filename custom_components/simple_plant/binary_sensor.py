@@ -60,15 +60,18 @@ class SimplePlantBinarySensor(BinarySensorEntity):
             else self._attr_native_value
         )
 
-    def get_dates(self) -> dict[str, date] | None:
-        """Get dates from relevants device entites states."""
+    @property
+    def device(self) -> str | None:
+        """Return the device name."""
         if not self._attr_device_info or "name" not in self._attr_device_info:
             return None
-        device = str(self._attr_device_info["name"]).lower()
+        return str(self._attr_device_info["name"]).lower()
 
+    def get_dates(self) -> dict[str, date] | None:
+        """Get dates from relevants device entites states."""
         states_to_get = {
-            "last_watered": f"date.{DOMAIN}_last_watered_{device}",
-            "nb_days": f"number.{DOMAIN}_days_between_waterings_{device}",
+            "last_watered": f"date.{DOMAIN}_last_watered_{self.device}",
+            "nb_days": f"number.{DOMAIN}_days_between_waterings_{self.device}",
         }
 
         # Get states from hass
