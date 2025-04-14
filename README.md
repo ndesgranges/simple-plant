@@ -29,6 +29,12 @@ This integration provides the following entities
 | number.simple_plant_**days_between_waterings**_@ | Amount of days to wait before each watering before notifying                                                                        |
 | select.simple_plant_**health**_@                 | A manual dumb selector just to note the current health of your plant, it doesn't do anything else                                   |
 
+## TODO
+
+  - [ ] Better linking of the internal name given through config flow and name given through home assistant "rename"
+  - [ ] Ability to change image
+  - [ ] Add a dashboard widget or give an example
+  - [ ] Investigate state colors
 
 ## Credits
 
