@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
 from typing import TYPE_CHECKING
 
 from homeassistant.components.binary_sensor import (
@@ -13,9 +12,11 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.event import async_track_state_change_event
 
-from .const import DOMAIN, LOGGER, MANUFACTURER
+from .const import DOMAIN, MANUFACTURER
 
 if TYPE_CHECKING:
+    from datetime import date
+
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import Event, EventStateChangedData, HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -25,7 +26,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
     """simple_plant binary_sensor base class."""
 
     _attr_has_entity_name = True
-    _fallback_value: bool
+    _fallback_value: bool = False
 
     def __init__(
         self,
@@ -37,6 +38,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         super().__init__()
         self._hass = hass
         self.entity_description = description
+        self.coordinator = hass.data[DOMAIN][entry.entry_id]
 
         self._attr_native_value: bool | None = None
 
@@ -69,34 +71,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
 
     def get_dates(self) -> dict[str, date] | None:
         """Get dates from relevants device entites states."""
-        states_to_get = {
-            "last_watered": f"date.{DOMAIN}_last_watered_{self.device}",
-            "nb_days": f"number.{DOMAIN}_days_between_waterings_{self.device}",
-        }
-
-        # Get states from hass
-        data = {key: self.hass.states.get(eid) for key, eid in states_to_get.items()}
-
-        # Check if all states are available
-        if any(
-            data[key] is None
-            or not data[key].state  # type: ignore noqa: PGH003
-            or data[key].state == "unavailable"  # type: ignore noqa: PGH003
-            for key in states_to_get
-        ):
-            LOGGER.warning("%s: Couldn't get all states", self.unique_id)
-            return None
-
-        states = {key: data.state for key, data in data.items() if data is not None}
-
-        last_watered_date = date.fromisoformat(states["last_watered"])
-        nb_days = float(states["nb_days"])
-
-        return {
-            "last_watered": last_watered_date,
-            "next_watering": last_watered_date + timedelta(days=nb_days),
-            "today": date.today(),  # noqa: DTZ011
-        }
+        return self.coordinator.get_dates()
 
     async def async_added_to_hass(self) -> None:
         """Run when entity about to be added to hass."""
