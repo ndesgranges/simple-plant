@@ -31,10 +31,10 @@ This integration provides the following entities
 
 ## TODO
 
-  - [ ] Better linking of the internal name given through config flow and name given through home assistant "rename"
-  - [ ] Ability to change image
-  - [ ] Add a dashboard widget or give an example
-  - [ ] Investigate state colors
+  - [ ] Better linking of the internal name given through config flow and name given through home assistant "rename" [#3](https://github.com/ndesgranges/simple-plant/issues/3)
+  - [ ] Ability to change image See [#4](https://github.com/ndesgranges/simple-plant/issues/4)
+  - [ ] Add a dashboard widget or give an example [#5](https://github.com/ndesgranges/simple-plant/issues/5)
+  - [ ] Investigate state colors [#7](https://github.com/ndesgranges/simple-plant/issues/7)
 
 ## Credits
 
