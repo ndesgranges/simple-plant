@@ -14,6 +14,21 @@ I've been testing a lot of services just to help me with this task, but the inte
 
 Simple plant aims to fix this.
 
+## Installation
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ndesgranges&repository=simple-plant&category=integration)
+
+OR
+
+1. Install HACS if you don't have it already
+2. Open HACS in Home Assistant
+3. On the top right side, click the three dot and click `Custom repositories`
+4. Where asked for a URL, paste the link of this repository:
+https://github.com/ndesgranges/simple-plant
+5. Where asked for a type, select `integration`
+4. Click the download button. ⬇️
+
+
 ## Entities
 
 This integration provides the following entities
