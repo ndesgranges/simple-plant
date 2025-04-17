@@ -2,6 +2,8 @@
     "name": "ndesgranges/simple-plant",
     "image": "mcr.microsoft.com/devcontainers/python:3.13",
     "postCreateCommand": "scripts/setup",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/simple-plant,type=bind",
+    "workspaceFolder": "/workspaces/simple-plant",
     "forwardPorts": [
         8123
     ],
@@ -18,7 +20,8 @@
                 "github.vscode-pull-request-github",
                 "ms-python.python",
                 "ms-python.vscode-pylance",
-                "ryanluker.vscode-coverage-gutters"
+                "ryanluker.vscode-coverage-gutters",
+                "mhutchie.git-graph"
             ],
             "settings": {
                 "files.eol": "\n",

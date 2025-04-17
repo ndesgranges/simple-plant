@@ -1,5 +1,6 @@
 {
     "name": "Simple Plant",
     "homeassistant": "2025.2.4",
-    "hacs": "2.0.1"
+    "hacs": "2.0.1",
+    "hide_default_branch": true
 }

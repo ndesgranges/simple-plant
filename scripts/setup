@@ -5,3 +5,6 @@ set -e
 cd "$(dirname "$0")/.."
 
 python3 -m pip install --requirement requirements.txt
+
+# Install HACS
+wget -O - https://get.hacs.xyz | bash -
