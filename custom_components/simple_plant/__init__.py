@@ -67,7 +67,7 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
         # Get the photo path from the entry's data
         photo_path = entry.data.get("photo")
         if photo_path:
-            # Convert /local/simple_plant/xxx.png to actual file path
+            # Convert url path to actual file path
             file_path = Path(str(hass.config.path(photo_path.lstrip("/"))))
 
             # Check if file exists before trying to remove it

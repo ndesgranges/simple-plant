@@ -52,7 +52,7 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         with process_uploaded_file(self.hass, file_id) as uploaded_file:
             # Save the file
-            storage_dir = Path(self.hass.config.path("local", STORAGE_DIR))
+            storage_dir = Path(self.hass.config.path(STORAGE_DIR))
             storage_dir.mkdir(parents=True, exist_ok=True)
 
             suffix = uploaded_file.suffix
@@ -69,7 +69,7 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     await destination_file.write(await source_file.read())
 
             # store path
-            relative_path = f"/local/{STORAGE_DIR}/{file_path.name}"
+            relative_path = f"/{STORAGE_DIR}/{file_path.name}"
             user_input["photo"] = relative_path
 
             return self.async_create_entry(title=user_input["name"], data=user_input)
