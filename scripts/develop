@@ -17,7 +17,7 @@ fi
 export PYTHONPATH="${PYTHONPATH}:${PWD}/custom_components"
 
 # Copy custom card
-cp -R "${PWD}/custom_components/simple_plant_card" "${PWD}/config/www/simple_plant_card"
+cp -R "${PWD}/custom_components/simple_plant_card/" "${PWD}/config/www/"
 
 # Start Home Assistant
 hass --config "${PWD}/config" --debug
