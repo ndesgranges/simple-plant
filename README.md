@@ -2,6 +2,8 @@
 ![Simple Plant Icon](custom_components/simple_plant/brands/icon/icon.png)
 # Simple Plant
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+
 Simple plant aims to provide a very simple integration to help you list and take care of your plants without any external service or sensor.
 
 ## Context
