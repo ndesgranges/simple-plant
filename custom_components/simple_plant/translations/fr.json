@@ -64,6 +64,11 @@
                     "excellent": "Rayonnante"
                 }
             }
+        },
+        "sensor": {
+            "next_watering": {
+                "name": "Prochain arrosage"
+            }
         }
     },
     "exceptions": {

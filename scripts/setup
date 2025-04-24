@@ -8,3 +8,8 @@ python3 -m pip install --requirement requirements.txt
 
 # Install HACS
 wget -O - https://get.hacs.xyz | bash -
+
+# Update node
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable

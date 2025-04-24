@@ -45,7 +45,8 @@
             "packages": [
                 "ffmpeg",
                 "libturbojpeg0",
-                "libpcap-dev"
+                "libpcap-dev",
+                "npm"
             ]
         }
     }
