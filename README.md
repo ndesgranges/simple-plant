@@ -50,9 +50,10 @@ This integration provides the following entities
 
   - [ ] Better linking of the internal name given through config flow and name given through home assistant "rename" [#3](https://github.com/ndesgranges/simple-plant/issues/3)
   - [ ] Ability to change image See [#4](https://github.com/ndesgranges/simple-plant/issues/4)
-  - [ ] Add a dashboard widget or give an example [#5](https://github.com/ndesgranges/simple-plant/issues/5)
+  - [x] Add a dashboard widget or give an example [#5](https://github.com/ndesgranges/simple-plant/issues/5)
   - [ ] Investigate state colors [#7](https://github.com/ndesgranges/simple-plant/issues/7)
-  - [ ] Add a sensor entity with a date value: the date when the watering "is due" [#8](https://github.com/ndesgranges/simple-plant/issues/8)
+  - [x] Add a sensor entity with a date value: the date when the watering "is due" [#8](https://github.com/ndesgranges/simple-plant/issues/8)
+  - [ ] Slugify the name where its used as device id
 
 ## Credits
 

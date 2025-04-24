@@ -69,7 +69,6 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     await destination_file.write(await source_file.read())
 
             # store path
-            # TODO : Slugify !!
             relative_path = f"/{STORAGE_DIR}/{file_path.name}"
             user_input["photo"] = relative_path
 

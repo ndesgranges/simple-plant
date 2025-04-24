@@ -21,7 +21,8 @@
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "ryanluker.vscode-coverage-gutters",
-                "mhutchie.git-graph"
+                "mhutchie.git-graph",
+                "runem.lit-plugin"
             ],
             "settings": {
                 "files.eol": "\n",
