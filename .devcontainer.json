@@ -21,7 +21,8 @@
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "ryanluker.vscode-coverage-gutters",
-                "mhutchie.git-graph"
+                "mhutchie.git-graph",
+                "runem.lit-plugin"
             ],
             "settings": {
                 "files.eol": "\n",
@@ -45,7 +46,8 @@
             "packages": [
                 "ffmpeg",
                 "libturbojpeg0",
-                "libpcap-dev"
+                "libpcap-dev",
+                "npm"
             ]
         }
     }

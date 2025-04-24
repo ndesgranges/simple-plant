@@ -1,0 +1,130 @@
+"""Sensor platform for simple_plant."""
+
+from __future__ import annotations
+
+from datetime import date
+from typing import TYPE_CHECKING
+
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+)
+from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.event import async_track_state_change_event
+
+from .const import DOMAIN, MANUFACTURER
+
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import Event, EventStateChangedData, HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+    from .coordinator import SimplePlantCoordinator
+
+
+ENTITY_DESCRIPTIONS = (
+    SensorEntityDescription(
+        device_class=SensorDeviceClass.DATE,
+        key="next_watering",
+        translation_key="next_watering",
+        icon="mdi:clipboard-text-clock",
+    ),
+)
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up the sensor platform."""
+    async_add_entities(
+        SimplePlantSensor(hass, entry, entity_description)
+        for entity_description in ENTITY_DESCRIPTIONS
+    )
+
+
+class SimplePlantSensor(SensorEntity):
+    """simple_plant sensor class."""
+
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        entry: ConfigEntry,
+        description: SensorEntityDescription,
+    ) -> None:
+        """Initialize the sensor class."""
+        super().__init__()
+        self.entity_description = description
+        self._fallback_value: date | None = None
+        self._attr_native_value: date | None = None
+        self.coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
+
+        self.entity_id = f"sensor.{DOMAIN}_{description.key}_{entry.title}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+
+        # Set up device info
+        name = entry.title[0].upper() + entry.title[1:]
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            name=name,
+            manufacturer=MANUFACTURER,
+        )
+
+    @staticmethod
+    def str2date(iso_date: str) -> date:
+        """Convert string to date."""
+        return date.fromisoformat(iso_date)
+
+    @property
+    def device(self) -> str | None:
+        """Return the device name."""
+        if not self._attr_device_info or "name" not in self._attr_device_info:
+            return None
+        return str(self._attr_device_info["name"]).lower()
+
+    @property
+    def native_value(self) -> date | None:
+        """Return true if the binary_sensor is on."""
+        return (
+            self._fallback_value
+            if self._attr_native_value is None
+            else self._attr_native_value
+        )
+
+    async def async_added_to_hass(self) -> None:
+        """Run when entity is added to hass."""
+        await super().async_added_to_hass()
+
+        self.async_on_remove(
+            async_track_state_change_event(
+                self.hass,
+                f"date.{DOMAIN}_last_watered_{self.device}",
+                self._update_state,
+            )
+        )
+        self.async_on_remove(
+            async_track_state_change_event(
+                self.hass,
+                f"number.{DOMAIN}_days_between_waterings_{self.device}",
+                self._update_state,
+            )
+        )
+
+        # Initial update
+        await self._update_state()
+
+    async def _update_state(
+        self, _event: Event[EventStateChangedData] | None = None
+    ) -> None:
+        """Update the binary sensor state based on other entities."""
+        dates = self.coordinator.get_dates()
+
+        if not dates:
+            return
+
+        self._attr_native_value = dates["next_watering"]
+        self.async_write_ha_state()

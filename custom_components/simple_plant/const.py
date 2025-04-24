@@ -41,4 +41,5 @@ PLATFORMS: list[Platform] = [
     Platform.IMAGE,
     Platform.NUMBER,
     Platform.SELECT,
+    Platform.SENSOR,
 ]

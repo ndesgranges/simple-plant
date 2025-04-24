@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "Copying card"
+cp -r "${PWD}"/simple-plant-card/dist/* \
+   "${PWD}/config/www/community/simple-plant-card/"
+
+if [[ "$1" == "--all" ]]
+then
+    echo "Copying component"
+    cp -r "${PWD}"/custom_components/simple_plant/* \
+        "${PWD}/config/custom_components/simple_plant/";
+fi

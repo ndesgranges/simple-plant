@@ -64,6 +64,11 @@
                     "excellent": "Excellent"
                 }
             }
+        },
+        "sensor": {
+            "next_watering": {
+                "name": "Next watering"
+            }
         }
     },
     "exceptions": {
