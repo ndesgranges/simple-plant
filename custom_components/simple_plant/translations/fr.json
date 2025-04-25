@@ -15,6 +15,7 @@
         },
         "error": {
             "invalid_future_date": "Impossible de définir une date d'arrosage dans le futur.",
+            "name_exist": "Une plante porte déjà ce nom.",
             "upload_failed_generic": "File upload failed, soomething went wrong.",
             "upload_failed_type": "File upload failed, the file type is not a supported image type.",
             "unknown": "Unknown error occurred."

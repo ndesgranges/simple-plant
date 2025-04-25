@@ -53,8 +53,7 @@ This integration provides the following entities
 
   - [ ] Better linking of the internal name given through config flow and name given through home assistant "rename" [#3](https://github.com/ndesgranges/simple-plant/issues/3)
   - [ ] Ability to change image See [#4](https://github.com/ndesgranges/simple-plant/issues/4)
-  - [x] Investigate state colors [#7](https://github.com/ndesgranges/simple-plant/issues/7)
-  - [ ] Slugify the name where its used as device id [#14](https://github.com/ndesgranges/simple-plant/issues/14)
+  - [x] Slugify the name where its used as device id [#14](https://github.com/ndesgranges/simple-plant/issues/14)
 
 ## Credits
 

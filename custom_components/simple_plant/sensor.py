@@ -65,8 +65,10 @@ class SimplePlantSensor(SensorEntity):
         self._attr_native_value: date | None = None
         self.coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
 
-        self.entity_id = f"sensor.{DOMAIN}_{description.key}_{entry.title}"
-        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+        device = self.coordinator.device
+
+        self.entity_id = f"sensor.{DOMAIN}_{description.key}_{device}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{device}"
 
         self._attr_extra_state_attributes = {
             "state_color": False,
@@ -75,7 +77,7 @@ class SimplePlantSensor(SensorEntity):
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            identifiers={(DOMAIN, f"{DOMAIN}_{device}")},
             name=name,
             manufacturer=MANUFACTURER,
         )
@@ -88,9 +90,7 @@ class SimplePlantSensor(SensorEntity):
     @property
     def device(self) -> str | None:
         """Return the device name."""
-        if not self._attr_device_info or "name" not in self._attr_device_info:
-            return None
-        return str(self._attr_device_info["name"]).lower()
+        return self.coordinator.device
 
     @property
     def native_value(self) -> date | None:

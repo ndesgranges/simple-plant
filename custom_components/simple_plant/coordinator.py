@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.util import slugify
 
 from .const import DOMAIN, LOGGER
 from .data import SimplePlantStore
@@ -26,7 +27,7 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
             LOGGER,
             name=DOMAIN,
         )
-        self.device = entry.title.lower()
+        self.device = slugify(entry.title)
         self.store = SimplePlantStore(hass)
         self.entry = entry
 

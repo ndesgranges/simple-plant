@@ -15,6 +15,7 @@
         },
         "error": {
             "invalid_future_date": "Cannot set watering date in the future.",
+            "name_exist": "Plant with this name already exist",
             "upload_failed_generic": "File upload failed, soomething went wrong.",
             "upload_failed_type": "File upload failed, the file type is not a supported image type.",
             "unknown": "Unknown error occurred."

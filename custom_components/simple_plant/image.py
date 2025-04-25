@@ -19,6 +19,8 @@ if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+    from .coordinator import SimplePlantCoordinator
+
 
 ENTITY_DESCRIPTIONS = (
     ImageEntityDescription(
@@ -56,18 +58,22 @@ class SimplePlantImage(ImageEntity):
         super().__init__(hass)
         self.entity_description = description
 
+        self.coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
+
+        device = self.coordinator.device
+
         image_path = str(entry.data.get("photo"))
         self._attr_image_url = hass.config.path(image_path.lstrip("/"))
 
         self._attr_content_type = self._get_content_type(Path(image_path))
 
-        self.entity_id = f"image.{DOMAIN}_{description.key}_{entry.title}"
-        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+        self.entity_id = f"image.{DOMAIN}_{description.key}_{device}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{device}"
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            identifiers={(DOMAIN, f"{DOMAIN}_{device}")},
             name=name,
             manufacturer=MANUFACTURER,
         )
@@ -75,9 +81,7 @@ class SimplePlantImage(ImageEntity):
     @property
     def device(self) -> str | None:
         """Return the device name."""
-        if not self._attr_device_info or "name" not in self._attr_device_info:
-            return None
-        return str(self._attr_device_info["name"]).lower()
+        return self.coordinator.device
 
     def _get_content_type(self, path: Path) -> str:
         """Get the content type of the image based on its extension."""
