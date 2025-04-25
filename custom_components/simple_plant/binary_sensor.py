@@ -12,7 +12,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.event import async_track_state_change_event
 
-from .const import DOMAIN, LOGGER, MANUFACTURER
+from .const import DOMAIN, MANUFACTURER
 
 if TYPE_CHECKING:
     from datetime import date
