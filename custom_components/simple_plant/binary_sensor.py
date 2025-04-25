@@ -12,7 +12,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.event import async_track_state_change_event
 
-from .const import DOMAIN, MANUFACTURER
+from .const import DOMAIN, LOGGER, MANUFACTURER
 
 if TYPE_CHECKING:
     from datetime import date
@@ -20,6 +20,8 @@ if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import Event, EventStateChangedData, HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+    from .coordinator import SimplePlantCoordinator
 
 
 class SimplePlantBinarySensor(BinarySensorEntity):
@@ -38,17 +40,19 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         super().__init__()
         self._hass = hass
         self.entity_description = description
-        self.coordinator = hass.data[DOMAIN][entry.entry_id]
+        self.coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
+
+        device = self.coordinator.device
 
         self._attr_native_value: bool | None = None
 
-        self.entity_id = f"binary_sensor.{DOMAIN}_{description.key}_{entry.title}"
-        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+        self.entity_id = f"binary_sensor.{DOMAIN}_{description.key}_{device}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{device}"
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            identifiers={(DOMAIN, f"{DOMAIN}_{device}")},
             name=name,
             manufacturer=MANUFACTURER,
         )
@@ -65,9 +69,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
     @property
     def device(self) -> str | None:
         """Return the device name."""
-        if not self._attr_device_info or "name" not in self._attr_device_info:
-            return None
-        return str(self._attr_device_info["name"]).lower()
+        return self.coordinator.device
 
     def get_dates(self) -> dict[str, date] | None:
         """Get dates from relevants device entites states."""
@@ -76,9 +78,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
     async def async_added_to_hass(self) -> None:
         """Run when entity about to be added to hass."""
         await super().async_added_to_hass()
-        if not self._attr_device_info or "name" not in self._attr_device_info:
-            return
-        device = str(self._attr_device_info["name"]).lower()
+        device = self.coordinator.device
 
         # Subscribe to state changes
         self.async_on_remove(

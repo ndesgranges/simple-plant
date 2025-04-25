@@ -54,19 +54,21 @@ class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):
         description: DateEntityDescription,
     ) -> None:
         """Initialize the date class."""
-        coordinator = hass.data[DOMAIN][entry.entry_id]
+        coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
         super().__init__(coordinator)
         self.entity_description = description
 
+        device = self.coordinator.device
+
         self._fallback_value = self.str2date(str(entry.data.get("last_watered")))
 
-        self.entity_id = f"date.{DOMAIN}_{description.key}_{entry.title}"
-        self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+        self.entity_id = f"date.{DOMAIN}_{description.key}_{device}"
+        self._attr_unique_id = f"{DOMAIN}_{description.key}_{device}"
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{entry.title}")},
+            identifiers={(DOMAIN, f"{DOMAIN}_{device}")},
             name=name,
             manufacturer=MANUFACTURER,
         )
@@ -84,9 +86,7 @@ class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):
     @property
     def device(self) -> str | None:
         """Return the device name."""
-        if not self._attr_device_info or "name" not in self._attr_device_info:
-            return None
-        return str(self._attr_device_info["name"]).lower()
+        return self.coordinator.device
 
     async def async_added_to_hass(self) -> None:
         """Run when entity is added to hass."""
