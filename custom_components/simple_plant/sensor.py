@@ -32,6 +32,8 @@ ENTITY_DESCRIPTIONS = (
     ),
 )
 
+COLOR_MAPPING = {"Today": "Goldenrod", "Late": "Tomato"}
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -65,6 +67,10 @@ class SimplePlantSensor(SensorEntity):
 
         self.entity_id = f"sensor.{DOMAIN}_{description.key}_{entry.title}"
         self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
+
+        self._attr_extra_state_attributes = {
+            "state_color": False,
+        }
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
@@ -126,5 +132,21 @@ class SimplePlantSensor(SensorEntity):
         if not dates:
             return
 
+        # Color
+        color_key = "OK"
+        if dates["today"] == dates["next_watering"]:
+            color_key = "Today"
+        if dates["today"] > dates["next_watering"]:
+            color_key = "Late"
+
+        if color_key in COLOR_MAPPING:
+            self._attr_extra_state_attributes = {
+                "state_color": True,
+                "color": COLOR_MAPPING[color_key],
+            }
+        else:
+            self._attr_extra_state_attributes = {"state_color": False}
+
+        # Value
         self._attr_native_value = dates["next_watering"]
         self.async_write_ha_state()

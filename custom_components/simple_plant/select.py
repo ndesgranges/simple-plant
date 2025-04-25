@@ -70,7 +70,9 @@ class SimplePlantSelect(SelectEntity):
         self.entity_id = f"select.{DOMAIN}_{description.key}_{entry.title}"
         self._attr_unique_id = f"{DOMAIN}_{description.key}_{entry.title}"
 
-        self._attr_extra_state_attributes = {}
+        self._attr_extra_state_attributes = {
+            "state_color": False,
+        }
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
@@ -110,16 +112,14 @@ class SimplePlantSelect(SelectEntity):
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
         self._attr_current_option = option
-        self._attr_extra_state_attributes = (
-            {
+        # Color
+        if option in COLOR_MAPPING:
+            self._attr_extra_state_attributes = {
                 "state_color": True,
                 "color": COLOR_MAPPING[option],
             }
-            if option in COLOR_MAPPING
-            else {
-                "state_color": False,
-            }
-        )
+        else:
+            self._attr_extra_state_attributes = {"state_color": False}
         # Save to persistent storage
         if self.unique_id is not None:
             await self.coordinator.async_store_value(self.unique_id, option)

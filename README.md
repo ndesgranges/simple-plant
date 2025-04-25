@@ -36,22 +36,22 @@ This integration provides the following entities
 > NOTE: \
 > In the following table, `@` represent the name of the device, for example, If I've got a device called "Foo" `test_@` would be `test_foo`
 
-| Entity                                           | Description                                                                                                                         |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| binary_sensor.simple_plant_**todo**_@            | `true` if the plant needs to be watered                                                                                             |
-| binary_sensor.simple_plant_**problem**_@         | `true` (and labelled as problem) if the plant "water date" is overdue                                                               |
-| button.simple_plant_**mark_watered**_@           | Mark the plant as watered                                                                                                           |
+| Entity | Description |
+| ------ | ----------- |
+| binary_sensor.simple_plant_**todo**_@            | `true` if the plant needs to be watered |
+| binary_sensor.simple_plant_**problem**_@         | `true` (and labelled as problem) if the plant "water date" is overdue |
+| button.simple_plant_**mark_watered**_@           | Mark the plant as watered |
 | date.simple_plant_**last_watered**_@             | Last time the plant has been marked as watered. In Theory it should not need to be changed manually, but it's there for flexibility |
-| image.simple_plant_**picture**_@                 | Just a picture of your plant to show in your dashboard                                                                              |
-| number.simple_plant_**days_between_waterings**_@ | Amount of days to wait before each watering before notifying                                                                        |
-| select.simple_plant_**health**_@                 | A manual dumb selector just to note the current health of your plant, it doesn't do anything else                                   |
+| image.simple_plant_**picture**_@                 | Just a picture of your plant to show in your dashboard |
+| number.simple_plant_**days_between_waterings**_@ | Amount of days to wait before each watering before notifying |
+| select.simple_plant_**health**_@                 | A manual dumb selector just to note the current health of your plant, it doesn't do anything else |
+| sensor.simple_plant_**next_watering**_@          | Stores the next date a watering is expected |
 
 ## TODO
 
   - [ ] Better linking of the internal name given through config flow and name given through home assistant "rename" [#3](https://github.com/ndesgranges/simple-plant/issues/3)
   - [ ] Ability to change image See [#4](https://github.com/ndesgranges/simple-plant/issues/4)
-  - [x] Add a dashboard widget or give an example [#5](https://github.com/ndesgranges/simple-plant/issues/5)
-  - [ ] Investigate state colors [#7](https://github.com/ndesgranges/simple-plant/issues/7)
+  - [x] Investigate state colors [#7](https://github.com/ndesgranges/simple-plant/issues/7)
   - [x] Add a sensor entity with a date value: the date when the watering "is due" [#8](https://github.com/ndesgranges/simple-plant/issues/8)
   - [ ] Slugify the name where its used as device id
 
