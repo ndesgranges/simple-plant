@@ -10,6 +10,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components.file_upload import process_uploaded_file
 from homeassistant.helpers import selector
+from homeassistant.util import slugify
 
 from .const import DOMAIN, HEALTH_OPTIONS, IMAGES_MIME_TYPES, LOGGER, STORAGE_DIR
 
@@ -34,6 +35,17 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             # 1st call
             return self.async_show_form(step_id="user", data_schema=user_form())
         # 2nd call
+        # Verify name
+        domain_entries = self.hass.config_entries.async_entries(domain=DOMAIN)
+        domain_entries_title_slugs = [slugify(entry.title) for entry in domain_entries]
+        LOGGER.debug(domain_entries_title_slugs)
+        if slugify(user_input["name"]) in domain_entries_title_slugs:
+            return self.async_show_form(
+                step_id="user",
+                data_schema=user_form(),
+                errors={"base": "name_exist"},
+            )
+        # Verify date
         if (
             "last_watered" in user_input
             and date.fromisoformat(user_input["last_watered"]) > date.today()  # noqa: DTZ011
@@ -72,7 +84,6 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             relative_path = f"/{STORAGE_DIR}/{file_path.name}"
             user_input["photo"] = relative_path
 
-            return self.async_create_entry(title=user_input["name"], data=user_input)
         return self.async_create_entry(title=user_input["name"], data=user_input)
 
 

@@ -5,12 +5,14 @@ set -e
 cd "$(dirname "$0")/.."
 
 echo "Copying card"
+mkdir -p ${PWD}/config/www/community/simple-plant-card/
 cp -r "${PWD}"/simple-plant-card/dist/* \
    "${PWD}/config/www/community/simple-plant-card/"
 
 if [[ "$1" == "--all" ]]
 then
     echo "Copying component"
+    mkdir -p "${PWD}/config/custom_components/simple_plant/"
     cp -r "${PWD}"/custom_components/simple_plant/* \
         "${PWD}/config/custom_components/simple_plant/";
 fi
