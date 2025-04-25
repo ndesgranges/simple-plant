@@ -6,6 +6,8 @@
 
 Simple plant aims to provide a very simple integration to help you list and take care of your plants without any external service or sensor.
 
+I also developped a custom card for this integration: [simple-plant-card](https://github.com/ndesgranges/simple-plant-card)
+
 ## Context
 
 Over the years, I've acquired a lot of plants. It became hard to remember when to water my plants.
@@ -26,8 +28,8 @@ OR
 4. Where asked for a URL, paste the link of this repository:
 https://github.com/ndesgranges/simple-plant
 5. Where asked for a type, select `integration`
-4. Click the download button. ⬇️
-
+6. Click the download button. ⬇️
+7. Install the [simple-plant-card](https://github.com/ndesgranges/simple-plant-card) card for your dashboard ! (optionnal)
 
 ## Entities
 
@@ -52,8 +54,7 @@ This integration provides the following entities
   - [ ] Better linking of the internal name given through config flow and name given through home assistant "rename" [#3](https://github.com/ndesgranges/simple-plant/issues/3)
   - [ ] Ability to change image See [#4](https://github.com/ndesgranges/simple-plant/issues/4)
   - [x] Investigate state colors [#7](https://github.com/ndesgranges/simple-plant/issues/7)
-  - [x] Add a sensor entity with a date value: the date when the watering "is due" [#8](https://github.com/ndesgranges/simple-plant/issues/8)
-  - [ ] Slugify the name where its used as device id
+  - [ ] Slugify the name where its used as device id [#14](https://github.com/ndesgranges/simple-plant/issues/14)
 
 ## Credits
 
