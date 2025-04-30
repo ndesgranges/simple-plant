@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 
 import aiofiles
@@ -11,6 +11,7 @@ from homeassistant import config_entries
 from homeassistant.components.file_upload import process_uploaded_file
 from homeassistant.helpers import selector
 from homeassistant.util import slugify
+from homeassistant.util.dt import as_local, as_utc, utcnow
 
 from .const import DOMAIN, HEALTH_OPTIONS, IMAGES_MIME_TYPES, LOGGER, STORAGE_DIR
 
@@ -46,15 +47,14 @@ class SimplePlantFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 errors={"base": "name_exist"},
             )
         # Verify date
-        if (
-            "last_watered" in user_input
-            and date.fromisoformat(user_input["last_watered"]) > date.today()  # noqa: DTZ011
-        ):
-            return self.async_show_form(
-                step_id="user",
-                data_schema=user_form(),
-                errors={"base": "invalid_future_date"},
-            )
+        if "last_watered" in user_input:
+            date = as_utc(as_local(datetime.fromisoformat(user_input["last_watered"])))
+            if date > utcnow():
+                return self.async_show_form(
+                    step_id="user",
+                    data_schema=user_form(),
+                    errors={"base": "invalid_future_date"},
+                )
         if "photo" not in user_input:
             return self.async_show_form(
                 step_id="user",

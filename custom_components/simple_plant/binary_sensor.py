@@ -14,12 +14,12 @@ from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_change,
 )
+from homeassistant.util.dt import as_local
 
 from .const import DOMAIN, MANUFACTURER
 
 if TYPE_CHECKING:
-    import datetime
-    from datetime import date
+    from datetime import datetime
 
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import Event, EventStateChangedData, HomeAssistant
@@ -77,7 +77,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         """Return the device name."""
         return self.coordinator.device
 
-    def get_dates(self) -> dict[str, date] | None:
+    def get_dates(self) -> dict[str, datetime] | None:
         """Get dates from relevants device entites states."""
         return self.coordinator.get_dates()
 
@@ -116,7 +116,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
 
     async def _update_state(
         self,
-        _event: Event[EventStateChangedData] | datetime.datetime | None = None,
+        _event: Event[EventStateChangedData] | datetime | None = None,
     ) -> None:
         """Update the binary sensor state based on other entities."""
         raise NotImplementedError
@@ -134,7 +134,9 @@ class SimplePlantTodo(SimplePlantBinarySensor):
         if not dates:
             return
 
-        self._attr_native_value = dates["today"] >= dates["next_watering"]
+        self._attr_native_value = (
+            as_local(dates["today"]).date() >= as_local(dates["next_watering"]).date()
+        )
         self.async_write_ha_state()
 
 
@@ -151,7 +153,9 @@ class SimplePlantProblem(SimplePlantBinarySensor):
         if not dates:
             return
 
-        self._attr_native_value = dates["today"] > dates["next_watering"]
+        self._attr_native_value = (
+            as_local(dates["today"]).date() > as_local(dates["next_watering"]).date()
+        )
         self.async_write_ha_state()
 
 

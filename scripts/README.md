@@ -28,3 +28,12 @@ Example :
 ```sh
 export FAKETIME='@2025-12-30 23:55:00'
 ```
+
+or to set it to the current date/time :
+```sh
+export FAKETIME="+0d"
+```
+
+Sometimes, this might create errors in Home assistant, so removing
+temporarily `LD_PRELOAD` in `.devocontainer` and rebooting the container
+when stuck on a issue can be a good thing to try !
