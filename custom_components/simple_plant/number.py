@@ -11,9 +11,8 @@ from homeassistant.components.number import (
     NumberMode,
 )
 from homeassistant.const import UnitOfTime
-from homeassistant.helpers.device_registry import DeviceInfo
 
-from .const import DOMAIN, LOGGER, MANUFACTURER
+from .const import DOMAIN, LOGGER
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -79,12 +78,7 @@ class SimplePlantNumber(NumberEntity):
         self._fallback_value = entry.data.get("days_between_waterings")
 
         # Set up device info
-        name = entry.title[0].upper() + entry.title[1:]
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{device}")},
-            name=name,
-            manufacturer=MANUFACTURER,
-        )
+        self._attr_device_info = self.coordinator.device_info
 
     @property
     def device(self) -> str | None:

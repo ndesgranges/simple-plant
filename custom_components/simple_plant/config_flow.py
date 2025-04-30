@@ -115,7 +115,7 @@ def user_form() -> vol.Schema:
                     }
                 )
             ),
-            vol.Optional("comment", default=""): str,
+            vol.Optional("species", default=""): str,
             vol.Required("photo"): selector.FileSelector(
                 selector.FileSelectorConfig(accept="image/*")
             ),
