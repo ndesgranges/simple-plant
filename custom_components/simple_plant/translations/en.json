@@ -8,8 +8,8 @@
                     "last_watered": "Last time watered",
                     "days_between_waterings": "Days between watering",
                     "photo": "Photo",
-                    "health": "Current health",
-                    "comment": "Comment"
+                    "health": "Current health (Optional)",
+                    "species": "Species/Variety of your plant (Optional)"
                 }
             }
         },

@@ -8,8 +8,8 @@
                     "last_watered": "Dernier arrosage",
                     "days_between_waterings": "Nombre de jours entre chaque arrosage",
                     "photo": "Photo",
-                    "health": "Santé actuelle",
-                    "comment": "Commentaire"
+                    "health": "Santé actuelle (Optionnel)",
+                    "species": "Espèce/Variété (Optionnel)"
                 }
             }
         },
