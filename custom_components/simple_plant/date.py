@@ -9,11 +9,10 @@ from homeassistant.components.date import (
     DateEntity,
     DateEntityDescription,
 )
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util.dt import as_local, as_utc
 
-from .const import DOMAIN, MANUFACTURER
+from .const import DOMAIN
 from .coordinator import SimplePlantCoordinator
 
 if TYPE_CHECKING:
@@ -69,12 +68,7 @@ class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):
         self._attr_unique_id = f"{DOMAIN}_{description.key}_{device}"
 
         # Set up device info
-        name = entry.title[0].upper() + entry.title[1:]
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{device}")},
-            name=name,
-            manufacturer=MANUFACTURER,
-        )
+        self._attr_device_info = self.coordinator.device_info
 
     @property
     def device(self) -> str | None:

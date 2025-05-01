@@ -10,9 +10,8 @@ from homeassistant.components.image import (
     ImageEntity,
     ImageEntityDescription,
 )
-from homeassistant.helpers.device_registry import DeviceInfo
 
-from .const import DOMAIN, IMAGES_MIME_TYPES, LOGGER, MANUFACTURER
+from .const import DOMAIN, IMAGES_MIME_TYPES, LOGGER
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -71,12 +70,7 @@ class SimplePlantImage(ImageEntity):
         self._attr_unique_id = f"{DOMAIN}_{description.key}_{device}"
 
         # Set up device info
-        name = entry.title[0].upper() + entry.title[1:]
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{device}")},
-            name=name,
-            manufacturer=MANUFACTURER,
-        )
+        self._attr_device_info = self.coordinator.device_info
 
     @property
     def device(self) -> str | None:

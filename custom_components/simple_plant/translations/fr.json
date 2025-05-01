@@ -8,20 +8,34 @@
                     "last_watered": "Dernier arrosage",
                     "days_between_waterings": "Nombre de jours entre chaque arrosage",
                     "photo": "Photo",
-                    "health": "Santé actuelle",
-                    "comment": "Commentaire"
+                    "health": "Santé actuelle (Optionnel)",
+                    "species": "Espèce/Variété (Optionnel)"
                 }
             }
         },
         "error": {
             "invalid_future_date": "Impossible de définir une date d'arrosage dans le futur.",
             "name_exist": "Une plante porte déjà ce nom.",
-            "upload_failed_generic": "File upload failed, soomething went wrong.",
-            "upload_failed_type": "File upload failed, the file type is not a supported image type.",
-            "unknown": "Unknown error occurred."
+            "upload_failed_generic": "Une erreur est survenue, l'image n'a pas été sauvegardée?",
+            "upload_failed_type": "Le type de fichier n'est pas une image supportée, l'image n'a pas été sauvegardée.",
+            "unknown": "Une erreur inconnue est survenue."
         },
         "abort": {
-            "already_configured": "This entry is already configured."
+            "already_configured": "Cette entrée a déjà été configurée."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "description": "Modifiez L'image ou l'espèce de votre plante. Si vous avez besoin d'aide, allez jeter un oeil ici : https://github.com/ndesgranges/simple-plant",
+                "data": {
+                    "photo": "Photo",
+                    "species": "Espèce/Variété"
+                }
+            }
+        },
+        "error": {
+            "upload_failed_type": "File upload failed, the file type is not a supported image type."
         }
     },
     "entity": {

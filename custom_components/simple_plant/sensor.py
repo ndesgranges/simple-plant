@@ -9,14 +9,13 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorEntityDescription,
 )
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_change,
 )
 from homeassistant.util.dt import as_local
 
-from .const import DOMAIN, MANUFACTURER
+from .const import DOMAIN
 
 if TYPE_CHECKING:
     from datetime import date, datetime
@@ -80,12 +79,7 @@ class SimplePlantSensor(SensorEntity):
         }
 
         # Set up device info
-        name = entry.title[0].upper() + entry.title[1:]
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{DOMAIN}_{device}")},
-            name=name,
-            manufacturer=MANUFACTURER,
-        )
+        self._attr_device_info = self.coordinator.device_info
 
     @property
     def device(self) -> str | None:

@@ -6,11 +6,12 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.exceptions import ServiceValidationError
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import slugify
 from homeassistant.util.dt import as_local, as_utc, utcnow
 
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN, LOGGER, MANUFACTURER
 from .data import SimplePlantStore
 
 if TYPE_CHECKING:
@@ -31,6 +32,15 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
         self.device = slugify(entry.title)
         self.store = SimplePlantStore(hass)
         self.entry = entry
+
+        # Set up device info
+        name = entry.title[0].upper() + entry.title[1:]
+        self.device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"{DOMAIN}_{self.device}")},
+            name=name,
+            manufacturer=MANUFACTURER,
+            model=entry.data.get("species"),
+        )
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from storage."""
