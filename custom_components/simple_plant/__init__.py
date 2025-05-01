@@ -7,12 +7,12 @@ https://github.com/ndesgranges/simple-plant
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from homeassistant.helpers.config_validation import config_entry_only_config_schema
 
-from .const import DOMAIN, LOGGER, PLATFORMS
+from .config_flow import remove_photo
+from .const import DOMAIN, PLATFORMS
 from .coordinator import SimplePlantCoordinator
 
 if TYPE_CHECKING:
@@ -63,21 +63,7 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     await coordinator.remove_device_from_storage()
 
     # Remove photo
-    try:
-        # Get the photo path from the entry's data
-        photo_path = entry.data.get("photo")
-        if photo_path:
-            # Convert url path to actual file path
-            file_path = Path(str(hass.config.path(photo_path.lstrip("/"))))
-
-            # Check if file exists before trying to remove it
-            if file_path.exists():
-                file_path.unlink()
-                LOGGER.info(f"Successfully removed image file: %{file_path}")
-            else:
-                LOGGER.warning(f"Image file not found: {file_path}")
-    except OSError as err:
-        LOGGER.error(f"Error reading image file {file_path}: {err}")
+    remove_photo(hass, entry)
 
 
 async def async_reload_entry(

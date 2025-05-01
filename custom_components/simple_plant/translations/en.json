@@ -24,6 +24,20 @@
             "already_configured": "This entry is already configured."
         }
     },
+    "options": {
+        "step": {
+            "init": {
+                "description": "Modify the species or picture of your plant. If you need help with the configuration have a look here: https://github.com/ndesgranges/simple-plant",
+                "data": {
+                    "photo": "Photo",
+                    "species": "Species/Variety of your plant (Optional)"
+                }
+            }
+        },
+        "error": {
+            "upload_failed_type": "File upload failed, the file type is not a supported image type."
+        }
+    },
     "entity": {
         "button": {
             "mark_watered": {
