@@ -159,6 +159,7 @@ class SimplePlantFlowHandler(ConfigFlow, domain=DOMAIN):
                 data_schema=user_form(),
                 errors={"base": "name_exist"},
             )
+        user_input["name_by_user"] = user_input["name"]
         # Verify date
         if "last_watered" in user_input:
             date = as_utc(as_local(datetime.fromisoformat(user_input["last_watered"])))
@@ -227,7 +228,7 @@ class SimplePlantOptionFlowHandler(OptionsFlow):
     async def async_end(self) -> ConfigFlowResult:
         """Finitsh ConfigEntry modification."""
         LOGGER.info(
-            "Entry %s is beign recreated",
+            "Entry %s is being recreated",
             self.config_entry.entry_id,
         )
 
