@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import slugify
+from homeassistant.util.dt import as_local, as_utc, utcnow
 
 from .const import DOMAIN, LOGGER, MANUFACTURER
 from .data import SimplePlantStore
@@ -56,16 +57,17 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
         await self.store.async_save_data(self.device, {entity_id: value})
         await self.async_refresh()
 
-    async def async_set_last_watered(self, value: date) -> None:
+    async def async_set_last_watered(self, value: datetime) -> None:
         """Change last watered date manually."""
-        if value > date.today():  # noqa: DTZ011
+        new_value = as_utc(value)
+        if new_value > utcnow():
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
                 translation_key="invalid_future_date",
                 translation_placeholders={},
             )
         await self.store.async_save_data(
-            self.device, {"last_watered": value.isoformat()}
+            self.device, {"last_watered": new_value.isoformat()}
         )
         await self.async_refresh()
 
@@ -79,34 +81,40 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
         last_watered = None
         old_last_watered = None
         if "last_watered" in data:
-            last_watered = date.fromisoformat(data["last_watered"])
+            last_watered = as_utc(
+                as_local(datetime.fromisoformat(data["last_watered"]))
+            )
         if "_old_last_watered" in data:
-            old_last_watered = date.fromisoformat(data["_old_last_watered"])
+            old_last_watered = as_utc(
+                as_local(datetime.fromisoformat(data["_old_last_watered"]))
+            )
 
-        if last_watered and last_watered != date.today():  # noqa: DTZ011
+        if last_watered and as_local(last_watered).date() != as_local(utcnow()).date():
             await self.async_action_mark_as_watered(save_old=last_watered)
         else:
             await self.async_action_cancel_mark_as_watered(old_value=old_last_watered)
 
     async def async_action_cancel_mark_as_watered(
-        self, old_value: date | None = None
+        self, old_value: datetime | None = None
     ) -> None:
         """Update last watered date to old value."""
         if old_value:
-            await self.async_set_last_watered(old_value)
+            await self.async_set_last_watered(as_utc(old_value))
         else:
             await self.async_action_mark_as_watered()
 
-    async def async_action_mark_as_watered(self, save_old: date | None = None) -> None:
+    async def async_action_mark_as_watered(
+        self, save_old: datetime | None = None
+    ) -> None:
         """Update last watered date today."""
-        today = date.today()  # noqa: DTZ011
+        today = utcnow()
         if save_old:
             await self.store.async_save_data(
-                self.device, {"_old_last_watered": save_old.isoformat()}
+                self.device, {"_old_last_watered": as_utc(save_old).isoformat()}
             )
         await self.async_set_last_watered(today)
 
-    def get_dates(self) -> dict[str, date] | None:
+    def get_dates(self) -> dict[str, datetime] | None:
         """Get dates from relevants device entites states."""
         states_to_get = {
             "last_watered": f"date.{DOMAIN}_last_watered_{self.device}",
@@ -128,11 +136,11 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
 
         states = {key: data.state for key, data in data.items() if data is not None}
 
-        last_watered_date = date.fromisoformat(states["last_watered"])
+        last_watered_date = datetime.fromisoformat(states["last_watered"])
         nb_days = float(states["nb_days"])
 
         return {
             "last_watered": last_watered_date,
             "next_watering": last_watered_date + timedelta(days=nb_days),
-            "today": date.today(),  # noqa: DTZ011
+            "today": utcnow(),
         }

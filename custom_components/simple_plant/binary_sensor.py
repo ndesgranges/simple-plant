@@ -9,12 +9,16 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
-from homeassistant.helpers.event import async_track_state_change_event
+from homeassistant.helpers.event import (
+    async_track_state_change_event,
+    async_track_time_change,
+)
+from homeassistant.util.dt import as_local
 
 from .const import DOMAIN
 
 if TYPE_CHECKING:
-    from datetime import date
+    from datetime import datetime
 
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import Event, EventStateChangedData, HomeAssistant
@@ -41,6 +45,8 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         self.entity_description = description
         self.coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
 
+        self._attr_should_poll = True
+
         device = self.coordinator.device
 
         self._attr_native_value: bool | None = None
@@ -65,7 +71,7 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         """Return the device name."""
         return self.coordinator.device
 
-    def get_dates(self) -> dict[str, date] | None:
+    def get_dates(self) -> dict[str, datetime] | None:
         """Get dates from relevants device entites states."""
         return self.coordinator.get_dates()
 
@@ -89,12 +95,22 @@ class SimplePlantBinarySensor(BinarySensorEntity):
                 self._update_state,
             )
         )
+        self.async_on_remove(
+            async_track_time_change(
+                self.hass,
+                self._update_state,
+                hour=0,
+                minute=0,
+                second=0,
+            )
+        )
 
         # Initial update
         await self._update_state()
 
     async def _update_state(
-        self, _event: Event[EventStateChangedData] | None = None
+        self,
+        _event: Event[EventStateChangedData] | datetime | None = None,
     ) -> None:
         """Update the binary sensor state based on other entities."""
         raise NotImplementedError
@@ -112,7 +128,9 @@ class SimplePlantTodo(SimplePlantBinarySensor):
         if not dates:
             return
 
-        self._attr_native_value = dates["today"] >= dates["next_watering"]
+        self._attr_native_value = (
+            as_local(dates["today"]).date() >= as_local(dates["next_watering"]).date()
+        )
         self.async_write_ha_state()
 
 
@@ -129,7 +147,9 @@ class SimplePlantProblem(SimplePlantBinarySensor):
         if not dates:
             return
 
-        self._attr_native_value = dates["today"] > dates["next_watering"]
+        self._attr_native_value = (
+            as_local(dates["today"]).date() > as_local(dates["next_watering"]).date()
+        )
         self.async_write_ha_state()
 
 

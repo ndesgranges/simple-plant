@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from typing import TYPE_CHECKING
 
 from homeassistant.components.date import (
@@ -10,6 +10,7 @@ from homeassistant.components.date import (
     DateEntityDescription,
 )
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util.dt import as_local, as_utc
 
 from .const import DOMAIN
 from .coordinator import SimplePlantCoordinator
@@ -59,23 +60,15 @@ class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):
 
         device = self.coordinator.device
 
-        self._fallback_value = self.str2date(str(entry.data.get("last_watered")))
+        self._fallback_value = as_local(
+            datetime.fromisoformat(str(entry.data.get("last_watered")))
+        ).date()
 
         self.entity_id = f"date.{DOMAIN}_{description.key}_{device}"
         self._attr_unique_id = f"{DOMAIN}_{description.key}_{device}"
 
         # Set up device info
         self._attr_device_info = self.coordinator.device_info
-
-    @staticmethod
-    def str2date(iso_date: str) -> date:
-        """Convert string to date."""
-        return date.fromisoformat(iso_date)
-
-    @staticmethod
-    def date2str(date_obj: date) -> str:
-        """Convert date to str."""
-        return date_obj.isoformat()
 
     @property
     def device(self) -> str | None:
@@ -91,7 +84,9 @@ class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):
     async def async_set_value(self, value: date) -> None:
         """Change the date."""
         # Validate the date is not in the future
-        await self.coordinator.async_set_last_watered(value)
+        dt = datetime.combine(value, datetime.min.time())
+        new_val = as_utc(as_local(dt))
+        await self.coordinator.async_set_last_watered(new_val)
 
     @property
     def native_value(self) -> date | None:
@@ -103,4 +98,4 @@ class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):
         if not date_str:
             return None
 
-        return date.fromisoformat(date_str)
+        return as_local(datetime.fromisoformat(date_str)).date()
