@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING
 
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import async_get_hass
-from homeassistant.util import slugify
 from homeassistant.helpers.config_validation import config_entry_only_config_schema
 from homeassistant.helpers.device_registry import (
     EVENT_DEVICE_REGISTRY_UPDATED,
@@ -19,6 +18,7 @@ from homeassistant.helpers.device_registry import (
     async_entries_for_config_entry,
     async_get,
 )
+from homeassistant.util import slugify
 
 from .config_flow import remove_photo
 from .const import DOMAIN, LOGGER, PLATFORMS
