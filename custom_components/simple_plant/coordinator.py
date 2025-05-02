@@ -31,7 +31,7 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
         )
         self.device = slugify(entry.title)
         self.store = SimplePlantStore(hass)
-        self.entry = entry
+        self.config_entry = entry
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
