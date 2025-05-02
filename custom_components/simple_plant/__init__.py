@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import async_get_hass
+from homeassistant.util import slugify
 from homeassistant.helpers.config_validation import config_entry_only_config_schema
 from homeassistant.helpers.device_registry import (
     EVENT_DEVICE_REGISTRY_UPDATED,
@@ -103,9 +104,13 @@ async def on_device_registry_update_handler(
                 "name_by_user": device.name_by_user,
             }
         )
-        title = device.name_by_user
+        new_title = device.name_by_user
+
+        coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
+        await coordinator.async_rename_device(slugify(new_title))
+
         await hass.config_entries.async_unload(entry.entry_id)
-        hass.config_entries.async_update_entry(entry, data=data, title=title)
+        hass.config_entries.async_update_entry(entry, data=data, title=new_title)
         hass.config_entries.async_schedule_reload(entry.entry_id)
         device_registry.async_remove_device(device.id)
 
@@ -141,6 +146,10 @@ async def async_reload_entry(
     """Reload config entry."""
     if entry.title != entry.data.get("name"):
         LOGGER.info("Changing name of %s to %s", entry.data.get("name"), entry.title)
+        # Migrate storage storage
+        coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
+        await coordinator.async_rename_device(slugify(entry.title))
+        # Update entry
         data = dict(entry.data)
         data.update({"name": entry.title, "name_by_user": entry.title})
         hass.config_entries.async_update_entry(entry, data=data)
