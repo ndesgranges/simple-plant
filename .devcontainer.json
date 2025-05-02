@@ -6,7 +6,7 @@
     "workspaceFolder": "/workspaces/simple-plant",
     "containerEnv": {
         "LD_PRELOAD": "/usr/local/lib/faketime/libfaketime.so.1",
-        "FAKETIME": "@2025-12-30 22:55:00"
+        "FAKETIME": "+0d"
     },
     "forwardPorts": [
         8123

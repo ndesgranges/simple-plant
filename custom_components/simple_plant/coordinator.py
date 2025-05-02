@@ -31,7 +31,7 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
         )
         self.device = slugify(entry.title)
         self.store = SimplePlantStore(hass)
-        self.entry = entry
+        self.config_entry = entry
 
         # Set up device info
         name = entry.title[0].upper() + entry.title[1:]
@@ -55,6 +55,11 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
     async def async_store_value(self, entity_id: str, value: str) -> None:
         """Store value in the store."""
         await self.store.async_save_data(self.device, {entity_id: value})
+        await self.async_refresh()
+
+    async def async_rename_device(self, new_id: str) -> None:
+        """Migrate data for a device to another name."""
+        await self.store.async_rename_device(self.device, new_id)
         await self.async_refresh()
 
     async def async_set_last_watered(self, value: datetime) -> None:

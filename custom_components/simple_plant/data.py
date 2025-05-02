@@ -72,3 +72,23 @@ class SimplePlantStore:
         if device in self._data:
             del self._data[device]
             await self.store.async_save(self._data)
+
+    async def async_rename_device(self, device: str, new_id: str) -> None:
+        """Migrate device data from old `device` name to `new_name`."""
+        if self._data is None:
+            await self.async_load()
+        if self._data is None:  # for linting
+            LOGGER.error("Failed to load data from storage")
+            return
+        if device in self._data:
+            device_data: dict[str, Any] = self._data.get(device, {})
+            new_data = {}
+            for key, value in device_data.items():
+                if device in key:
+                    striped_key = key[: -len(device)]
+                    new_data[striped_key + new_id] = value
+                else:
+                    new_data[key] = value
+            self._data[new_id] = new_data
+            del self._data[device]
+            await self.store.async_save(self._data)
