@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import async_get_hass
 from homeassistant.helpers.config_validation import config_entry_only_config_schema
 from homeassistant.helpers.device_registry import (
@@ -42,7 +43,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
     LOGGER.debug("Setting up entry %s", entry.title)
     coordinator = SimplePlantCoordinator(hass, entry)
-    await coordinator.async_config_entry_first_refresh()
+
+    if entry.state == ConfigEntryState.SETUP_IN_PROGRESS:
+        await coordinator.async_config_entry_first_refresh()
+    else:
+        await coordinator.async_request_refresh()
 
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
@@ -147,5 +152,5 @@ async def async_reload_entry(
                 device_registry.async_remove_device(device.id)
         return
     LOGGER.info("Reloading entry %s", entry.title)
-    if await async_unload_entry(hass, entry):
-        await async_setup_entry(hass, entry)
+    await async_unload_entry(hass, entry)
+    await async_setup_entry(hass, entry)
