@@ -13,3 +13,8 @@ wget -O - https://get.hacs.xyz | bash -
 sudo npm cache clean -f
 sudo npm install -g n
 sudo n stable
+
+# Install faketime
+git clone https://github.com/wolfcw/libfaketime.git
+(cd libfaketime/src && sudo make install)
+rm -rf libfaketime
