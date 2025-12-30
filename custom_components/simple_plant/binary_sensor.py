@@ -10,11 +10,15 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.event import async_track_state_change_event
+from homeassistant.helpers.event import (
+    async_track_state_change_event,
+    async_track_time_change,
+)
 
 from .const import DOMAIN, MANUFACTURER
 
 if TYPE_CHECKING:
+    import datetime
     from datetime import date
 
     from homeassistant.config_entries import ConfigEntry
@@ -41,6 +45,8 @@ class SimplePlantBinarySensor(BinarySensorEntity):
         self._hass = hass
         self.entity_description = description
         self.coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
+
+        self._attr_should_poll = True
 
         device = self.coordinator.device
 
@@ -95,12 +101,22 @@ class SimplePlantBinarySensor(BinarySensorEntity):
                 self._update_state,
             )
         )
+        self.async_on_remove(
+            async_track_time_change(
+                self.hass,
+                self._update_state,
+                hour=0,
+                minute=0,
+                second=0,
+            )
+        )
 
         # Initial update
         await self._update_state()
 
     async def _update_state(
-        self, _event: Event[EventStateChangedData] | None = None
+        self,
+        _event: Event[EventStateChangedData] | datetime.datetime | None = None,
     ) -> None:
         """Update the binary sensor state based on other entities."""
         raise NotImplementedError
