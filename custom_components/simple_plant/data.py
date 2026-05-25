@@ -1,6 +1,6 @@
 """Storage helper for simple_plant."""
 
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Self
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
@@ -20,7 +20,7 @@ class SimplePlantStore:
     _instance: ClassVar["SimplePlantStore | None"] = None
     _initialized: bool = False
 
-    def __new__(cls, _hass: HomeAssistant) -> "SimplePlantStore":
+    def __new__(cls, _hass: HomeAssistant) -> Self:
         """Create a singleton instance."""
         if cls._instance is None:
             cls._instance = super().__new__(cls)

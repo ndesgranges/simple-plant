@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import aiofiles
+import aiofiles.os
 import voluptuous as vol
 from homeassistant.components.file_upload import process_uploaded_file
 from homeassistant.config_entries import (
@@ -33,7 +34,7 @@ async def save_image(hass: HomeAssistant, file_id: str) -> str:
     with process_uploaded_file(hass, file_id) as uploaded_file:
         # Save the file
         storage_dir = Path(hass.config.path(STORAGE_DIR))
-        storage_dir.mkdir(parents=True, exist_ok=True)
+        await aiofiles.os.makedirs(str(storage_dir), exist_ok=True)
 
         suffix = uploaded_file.suffix
         if suffix not in IMAGES_MIME_TYPES:
