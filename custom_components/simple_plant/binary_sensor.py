@@ -95,6 +95,48 @@ class SimplePlantProblem(SimplePlantBinarySensor):
         self.async_write_ha_state()
 
 
+class SimplePlantFertilizeTodo(SimplePlantBinarySensor):
+    """simple_plant binary_sensor for fertilization todo."""
+
+    _fallback_value = False
+    _tracked_date_key = "last_fertilized"
+    _tracked_number_key = "days_between_fertilizations"
+
+    async def _update_state(self, _event: Event | None = None) -> None:
+        """Update the binary sensor state based on fertilization entities."""
+        dates = self.coordinator.get_fertilization_dates()
+
+        if not dates:
+            return
+
+        self._attr_native_value = (
+            as_local(dates["today"]).date()
+            >= as_local(dates["next_fertilization"]).date()
+        )
+        self.async_write_ha_state()
+
+
+class SimplePlantFertilizeProblem(SimplePlantBinarySensor):
+    """simple_plant binary_sensor for late fertilization."""
+
+    _fallback_value = False
+    _tracked_date_key = "last_fertilized"
+    _tracked_number_key = "days_between_fertilizations"
+
+    async def _update_state(self, _event: Event | None = None) -> None:
+        """Update the binary sensor state based on fertilization entities."""
+        dates = self.coordinator.get_fertilization_dates()
+
+        if not dates:
+            return
+
+        self._attr_native_value = (
+            as_local(dates["today"]).date()
+            > as_local(dates["next_fertilization"]).date()
+        )
+        self.async_write_ha_state()
+
+
 ENTITIES = [
     {
         "class": SimplePlantTodo,
@@ -117,6 +159,28 @@ ENTITIES = [
     },
 ]
 
+FERTILIZATION_ENTITIES = [
+    {
+        "class": SimplePlantFertilizeTodo,
+        "description": BinarySensorEntityDescription(
+            key="fertilize_todo",
+            translation_key="fertilize_todo",
+            name="Simple Plant Binary Sensor Fertilize Todo",
+            icon="mdi:beaker-check-outline",
+        ),
+    },
+    {
+        "class": SimplePlantFertilizeProblem,
+        "description": BinarySensorEntityDescription(
+            key="fertilize_problem",
+            translation_key="fertilize_problem",
+            name="Simple Plant Binary Sensor Fertilize Problem",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            icon="mdi:beaker-alert-outline",
+        ),
+    },
+]
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -124,6 +188,12 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the binary_sensor platform."""
-    async_add_entities(
+    entities = [
         entity["class"](hass, entry, entity["description"]) for entity in ENTITIES
-    )
+    ]
+    if entry.data.get("days_between_fertilizations"):
+        entities.extend(
+            entity["class"](hass, entry, entity["description"])
+            for entity in FERTILIZATION_ENTITIES
+        )
+    async_add_entities(entities)

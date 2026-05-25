@@ -9,7 +9,9 @@
                     "days_between_waterings": "Tage zwischen den Bewässerungen",
                     "photo": "Foto",
                     "health": "Gesundheitszustand (Optional)",
-                    "species": "Art/Sorte Ihrer Pflanze (Optional)"
+                    "species": "Art/Sorte Ihrer Pflanze (Optional)",
+                    "last_fertilized": "Zuletzt gedüngt (Optional)",
+                    "days_between_fertilizations": "Tage zwischen den Düngungen (Optional)"
                 }
             }
         },
@@ -27,10 +29,12 @@
     "options": {
         "step": {
             "init": {
-                "description": "Ändern Sie die Art oder das Bild Ihrer Pflanze.",
+                "description": "Ändern Sie die Art, das Bild oder den Düngungsplan Ihrer Pflanze.",
                 "data": {
                     "photo": "Foto",
-                    "species": "Art/Sorte Ihrer Pflanze (Optional)"
+                    "species": "Art/Sorte Ihrer Pflanze (Optional)",
+                    "days_between_fertilizations": "Tage zwischen den Düngungen (leer lassen, um zu überspringen)",
+                    "remove_fertilization": "Düngungsplan entfernen"
                 }
             }
         },
@@ -42,6 +46,9 @@
         "button": {
             "mark_watered": {
                 "name": "Gegossen"
+            },
+            "mark_fertilized": {
+                "name": "Gedüngt"
             }
         },
         "binary_sensor": {
@@ -50,11 +57,20 @@
             },
             "problem": {
                 "name": "Bewässerung nötig"
+            },
+            "fertilize_todo": {
+                "name": "Düngen"
+            },
+            "fertilize_problem": {
+                "name": "Späte Düngung"
             }
         },
         "date": {
             "last_watered": {
                 "name": "Zuletzt gegossen"
+            },
+            "last_fertilized": {
+                "name": "Zuletzt gedüngt"
             }
         },
         "image": {
@@ -65,6 +81,9 @@
         "number": {
             "days_between_waterings": {
                 "name": "Tage zwischen den Bewässerungen"
+            },
+            "days_between_fertilizations": {
+                "name": "Tage zwischen den Düngungen"
             }
         },
         "select": {
@@ -84,8 +103,14 @@
             "next_watering": {
                 "name": "Nächste Bewässerung"
             },
+            "next_fertilization": {
+                "name": "Nächste Düngung"
+            },
             "plants_to_water": {
                 "name": "Pflanzen zu gießen"
+            },
+            "plants_to_fertilize": {
+                "name": "Pflanzen zu düngen"
             }
         }
     },

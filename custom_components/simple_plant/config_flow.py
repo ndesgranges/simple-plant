@@ -107,6 +107,17 @@ def user_form() -> vol.Schema:
             vol.Optional("photo"): selector.FileSelector(
                 selector.FileSelectorConfig(accept="image/*")
             ),
+            vol.Optional("last_fertilized"): selector.DateSelector(
+                selector.DateSelectorConfig(),
+            ),
+            vol.Optional("days_between_fertilizations"): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=1,
+                    max=365,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="days",
+                ),
+            ),
         }
     )
 
@@ -120,6 +131,17 @@ def option_form(suggested_species: str | None = None) -> vol.Schema:
             vol.Optional("photo"): selector.FileSelector(
                 selector.FileSelectorConfig(accept="image/*")
             ),
+            vol.Optional("days_between_fertilizations"): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=1,
+                    max=365,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="days",
+                ),
+            ),
+            vol.Optional(
+                "remove_fertilization", default=False
+            ): selector.BooleanSelector(),
         }
     )
 
@@ -181,6 +203,24 @@ class SimplePlantFlowHandler(ConfigFlow, domain=DOMAIN):  # pylint: disable=abst
                     errors={"base": "upload_failed_type"},
                 )
 
+        # Fertilization: if schedule is set but no date, default to today
+        if user_input.get("days_between_fertilizations") and not user_input.get(
+            "last_fertilized"
+        ):
+            user_input["last_fertilized"] = as_local(utcnow()).date().isoformat()
+
+        # Validate fertilization date
+        if user_input.get("last_fertilized"):
+            fert_date = as_utc(
+                as_local(datetime.fromisoformat(user_input["last_fertilized"]))
+            )
+            if fert_date > utcnow():
+                return self.async_show_form(
+                    step_id="user",
+                    data_schema=user_form(),
+                    errors={"base": "invalid_future_date"},
+                )
+
         return self.async_create_entry(title=user_input["name"], data=user_input)
 
 
@@ -218,6 +258,19 @@ class SimplePlantOptionFlowHandler(OptionsFlow):
                     step_id="user",
                     errors={"base": "upload_failed_type"},
                 )
+
+        # Handle fertilization
+        if user_input.get("remove_fertilization"):
+            self.user_inputs["days_between_fertilizations"] = None
+            self.user_inputs["last_fertilized"] = None
+        elif user_input.get("days_between_fertilizations"):
+            self.user_inputs["days_between_fertilizations"] = user_input[
+                "days_between_fertilizations"
+            ]
+            # Set last_fertilized to today if not already set
+            if not self.entry.data.get("last_fertilized"):
+                today = as_local(utcnow()).date().isoformat()
+                self.user_inputs["last_fertilized"] = today
 
         # On appelle le step de fin pour enregistrer les modifications
         return await self.async_end()
