@@ -83,6 +83,9 @@
         "sensor": {
             "next_watering": {
                 "name": "Prochain arrosage"
+            },
+            "plants_to_water": {
+                "name": "Plantes à arroser"
             }
         }
     },

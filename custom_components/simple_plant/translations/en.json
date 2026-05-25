@@ -83,6 +83,9 @@
         "sensor": {
             "next_watering": {
                 "name": "Next watering"
+            },
+            "plants_to_water": {
+                "name": "Plants to water"
             }
         }
     },

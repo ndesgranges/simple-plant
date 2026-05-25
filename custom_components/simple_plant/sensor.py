@@ -8,9 +8,15 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
+    SensorStateClass,
+)
+from homeassistant.helpers.event import (
+    async_track_state_change_event,
+    async_track_time_change,
 )
 from homeassistant.util.dt import as_local
 
+from .const import DOMAIN, LOGGER
 from .entity import SimplePlantTrackedEntity
 
 if TYPE_CHECKING:
@@ -39,10 +45,17 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensor platform."""
-    async_add_entities(
+    entities: list[SensorEntity] = [
         SimplePlantSensor(hass, entry, entity_description)
         for entity_description in ENTITY_DESCRIPTIONS
-    )
+    ]
+
+    # Create the global counter sensor only once
+    if not hass.data[DOMAIN].get("_global_sensor_created"):
+        hass.data[DOMAIN]["_global_sensor_created"] = True
+        entities.append(SimplePlantCountSensor(hass))
+
+    async_add_entities(entities)
 
 
 class SimplePlantSensor(SimplePlantTrackedEntity, SensorEntity):
@@ -100,4 +113,101 @@ class SimplePlantSensor(SimplePlantTrackedEntity, SensorEntity):
 
         # Value
         self._attr_native_value = next_watering
+        self.async_write_ha_state()
+
+
+GLOBAL_ENTITY_PREFIX = f"binary_sensor.{DOMAIN}_todo_"
+
+
+class SimplePlantCountSensor(SensorEntity):
+    """Sensor counting all plants that need watering (today or late)."""
+
+    _attr_has_entity_name = True
+    _attr_translation_key = "plants_to_water"
+    _attr_icon = "mdi:watering-can"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_value: int = 0
+
+    def __init__(self, hass: HomeAssistant) -> None:
+        """Initialize the global count sensor."""
+        self.hass = hass
+        self._attr_unique_id = f"{DOMAIN}_plants_to_water"
+
+    async def async_added_to_hass(self) -> None:
+        """Subscribe to state changes and midnight time change."""
+        self._update_count()
+
+        # Track all existing todo binary sensors
+        entity_ids = [
+            eid
+            for eid in self.hass.states.async_entity_ids("binary_sensor")
+            if eid.startswith(GLOBAL_ENTITY_PREFIX)
+        ]
+        if entity_ids:
+            self.async_on_remove(
+                async_track_state_change_event(
+                    self.hass, entity_ids, self._on_state_changed
+                )
+            )
+
+        # Midnight refresh (todo states are date-based)
+        self.async_on_remove(
+            async_track_time_change(
+                self.hass, self._on_midnight, hour=0, minute=0, second=0
+            )
+        )
+
+        # Listen for new plants being added
+        self.async_on_remove(
+            self.hass.bus.async_listen("state_changed", self._on_any_state_changed)
+        )
+
+    def _update_count(self) -> None:
+        """Count all todo binary sensors that are on."""
+        self._attr_native_value = sum(
+            1
+            for eid in self.hass.states.async_entity_ids("binary_sensor")
+            if eid.startswith(GLOBAL_ENTITY_PREFIX)
+            and self.hass.states.get(eid) is not None
+            and self.hass.states.get(eid).state == "on"  # type: ignore[union-attr]
+        )
+
+    async def _on_state_changed(self, _event: Event[EventStateChangedData]) -> None:
+        """Handle tracked entity state change."""
+        self._update_count()
+        self.async_write_ha_state()
+
+    async def _on_midnight(self, _now: datetime) -> None:
+        """Refresh at midnight."""
+        self._update_count()
+        self.async_write_ha_state()
+
+    async def _on_any_state_changed(self, event: Event) -> None:  # type: ignore[type-arg]
+        """Track newly added or removed todo entities."""
+        entity_id: str = event.data.get("entity_id", "")
+        if not entity_id.startswith(GLOBAL_ENTITY_PREFIX):
+            return
+
+        old_state = event.data.get("old_state")
+        new_state = event.data.get("new_state")
+
+        if new_state is None:
+            # Entity removed, recount
+            LOGGER.debug("Todo entity removed: %s", entity_id)
+            self._update_count()
+            self.async_write_ha_state()
+            return
+
+        if old_state is not None:
+            # Existing entity state change, already tracked
+            return
+
+        # New todo entity appeared , subscribe and recount
+        LOGGER.debug("New todo entity detected: %s", entity_id)
+        self.async_on_remove(
+            async_track_state_change_event(
+                self.hass, [entity_id], self._on_state_changed
+            )
+        )
+        self._update_count()
         self.async_write_ha_state()

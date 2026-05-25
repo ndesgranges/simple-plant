@@ -83,6 +83,9 @@
         "sensor": {
             "next_watering": {
                 "name": "Следующий полив"
+            },
+            "plants_to_water": {
+                "name": "Растения для полива"
             }
         }
     },
