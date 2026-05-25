@@ -34,7 +34,7 @@ OR
 4. Where asked for a URL, paste the link of this repository:
 https://github.com/ndesgranges/simple-plant
 5. Where asked for a type, select `integration`
-6. Click the download button. ⬇️
+6. Click the download button.
 7. Install the [simple-plant-card](https://github.com/ndesgranges/simple-plant-card) card for your dashboard ! (optionnal)
 
 ## Entities
