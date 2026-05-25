@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "description": "Informations de base de votre plante. Si vous avez besoin d'aide, allez jeter un oeil ici : https://github.com/ndesgranges/simple-plant",
+                "description": "Informations de base de votre plante.",
                 "data": {
                     "name": "Nom",
                     "last_watered": "Dernier arrosage",
@@ -27,7 +27,7 @@
     "options": {
         "step": {
             "init": {
-                "description": "Modifiez L'image ou l'espèce de votre plante. Si vous avez besoin d'aide, allez jeter un oeil ici : https://github.com/ndesgranges/simple-plant",
+                "description": "Modifiez L'image ou l'espèce de votre plante.",
                 "data": {
                     "photo": "Photo",
                     "species": "Espèce/Variété"

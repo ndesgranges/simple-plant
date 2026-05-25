@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "description": "Provide base information for your new plant. If you need help with the configuration have a look here: https://github.com/ndesgranges/simple-plant",
+                "description": "Provide base information for your new plant.",
                 "data": {
                     "name": "Name",
                     "last_watered": "Last time watered",
@@ -27,7 +27,7 @@
     "options": {
         "step": {
             "init": {
-                "description": "Modify the species or picture of your plant. If you need help with the configuration have a look here: https://github.com/ndesgranges/simple-plant",
+                "description": "Modify the species or picture of your plant.",
                 "data": {
                     "photo": "Photo",
                     "species": "Species/Variety of your plant (Optional)"
