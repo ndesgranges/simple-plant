@@ -57,7 +57,10 @@ class SimplePlantEntity:  # pylint: disable=too-few-public-methods
 
 
 class SimplePlantTrackedEntity(SimplePlantEntity):
-    """Mixin for entities that track watering state changes."""
+    """Mixin for entities that track schedule state changes."""
+
+    _tracked_date_key: str = "last_watered"
+    _tracked_number_key: str = "days_between_waterings"
 
     async def async_added_to_hass(self) -> None:
         """Subscribe to state changes and midnight timer."""
@@ -65,14 +68,14 @@ class SimplePlantTrackedEntity(SimplePlantEntity):
         self.async_on_remove(  # pylint: disable=no-member
             async_track_state_change_event(
                 self.hass,
-                f"date.{DOMAIN}_last_watered_{self.device}",
+                f"date.{DOMAIN}_{self._tracked_date_key}_{self.device}",
                 self._update_state,
             )
         )
         self.async_on_remove(  # pylint: disable=no-member
             async_track_state_change_event(
                 self.hass,
-                f"number.{DOMAIN}_days_between_waterings_{self.device}",
+                f"number.{DOMAIN}_{self._tracked_number_key}_{self.device}",
                 self._update_state,
             )
         )

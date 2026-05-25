@@ -9,7 +9,9 @@
                     "days_between_waterings": "Days between watering",
                     "photo": "Photo",
                     "health": "Current health (Optional)",
-                    "species": "Species/Variety of your plant (Optional)"
+                    "species": "Species/Variety of your plant (Optional)",
+                    "last_fertilized": "Last time fertilized (Optional)",
+                    "days_between_fertilizations": "Days between fertilizations (Optional)"
                 }
             }
         },
@@ -27,10 +29,12 @@
     "options": {
         "step": {
             "init": {
-                "description": "Modify the species or picture of your plant.",
+                "description": "Modify the species, picture, or fertilization schedule of your plant.",
                 "data": {
                     "photo": "Photo",
-                    "species": "Species/Variety of your plant (Optional)"
+                    "species": "Species/Variety of your plant (Optional)",
+                    "days_between_fertilizations": "Days between fertilizations (leave empty to skip)",
+                    "remove_fertilization": "Remove fertilization schedule"
                 }
             }
         },
@@ -42,6 +46,9 @@
         "button": {
             "mark_watered": {
                 "name": "Mark watered"
+            },
+            "mark_fertilized": {
+                "name": "Mark fertilized"
             }
         },
         "binary_sensor": {
@@ -50,11 +57,20 @@
             },
             "problem": {
                 "name": "Late Watering"
+            },
+            "fertilize_todo": {
+                "name": "To Fertilize"
+            },
+            "fertilize_problem": {
+                "name": "Late Fertilization"
             }
         },
         "date": {
             "last_watered": {
                 "name": "Last time watered"
+            },
+            "last_fertilized": {
+                "name": "Last time fertilized"
             }
         },
         "image": {
@@ -65,6 +81,9 @@
         "number": {
             "days_between_waterings": {
                 "name": "Days between waterings"
+            },
+            "days_between_fertilizations": {
+                "name": "Days between fertilizations"
             }
         },
         "select": {
@@ -84,8 +103,14 @@
             "next_watering": {
                 "name": "Next watering"
             },
+            "next_fertilization": {
+                "name": "Next fertilization"
+            },
             "plants_to_water": {
                 "name": "Plants to water"
+            },
+            "plants_to_fertilize": {
+                "name": "Plants to fertilize"
             }
         }
     },

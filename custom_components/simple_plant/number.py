@@ -33,6 +33,18 @@ ENTITY_DESCRIPTIONS = (
     ),
 )
 
+FERTILIZATION_DESCRIPTIONS = (
+    NumberEntityDescription(
+        key="days_between_fertilizations",
+        translation_key="days_between_fertilizations",
+        device_class=NumberDeviceClass.DURATION,
+        mode=NumberMode.BOX,
+        icon="mdi:counter",
+        native_step=0,
+        native_unit_of_measurement=UnitOfTime.DAYS,
+    ),
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -40,10 +52,14 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the number platform."""
-    async_add_entities(
-        SimplePlantNumber(hass, entry, entity_description)
-        for entity_description in ENTITY_DESCRIPTIONS
-    )
+    entities: list[SimplePlantNumber] = [
+        SimplePlantNumber(hass, entry, desc) for desc in ENTITY_DESCRIPTIONS
+    ]
+    if entry.data.get("days_between_fertilizations"):
+        entities.extend(
+            SimplePlantNumber(hass, entry, desc) for desc in FERTILIZATION_DESCRIPTIONS
+        )
+    async_add_entities(entities)
 
 
 class SimplePlantNumber(SimplePlantStoredEntity, NumberEntity):  # pylint: disable=abstract-method
@@ -51,7 +67,7 @@ class SimplePlantNumber(SimplePlantStoredEntity, NumberEntity):  # pylint: disab
 
     _attr_should_poll = False
     _attr_native_min_value = 1
-    _attr_native_max_value = 60
+    _attr_native_max_value = 365
     _attr_native_step = 1
 
     def __init__(
@@ -62,7 +78,7 @@ class SimplePlantNumber(SimplePlantStoredEntity, NumberEntity):  # pylint: disab
     ) -> None:
         """Initialize the number class."""
         super().__init__(hass, entry, description, "number")
-        self._fallback_value = entry.data.get("days_between_waterings")
+        self._fallback_value = entry.data.get(description.key)
         self._attr_native_value: float | None = None
 
     async def _restore_value(self, value: Any) -> None:
