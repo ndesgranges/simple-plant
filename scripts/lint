@@ -6,3 +6,5 @@ cd "$(dirname "$0")/.."
 
 ruff format .
 ruff check . --fix
+
+pylint custom_components/simple_plant

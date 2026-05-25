@@ -4,11 +4,45 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-# Create config dir if not present
-if [[ ! -d "${PWD}/config" ]]; then
-    mkdir -p "${PWD}/config"
-    hass --config "${PWD}/config" --script ensure_config
+# Create config dir
+mkdir -p "${PWD}/config"
+hass --config "${PWD}/config" --script ensure_config
+
+# Install HACS
+wget -O - https://get.hacs.xyz | bash -
+
+# Install simple-plant
+if [[ ! -d "${PWD}/config/custom_components/simple_plant" ]]; then
+    ln -s "${PWD}/custom_components/simple_plant" "${PWD}/config/custom_components/simple_plant"
 fi
 
+#  Install simple-plant-card
+CARD_HA_DIR="${PWD}/config/www/community/simple-plant-card"
+CARD_DIST_DIR="${PWD}/simple-plant-card/dist"
+rm -rf "${CARD_HA_DIR}"
+mkdir -p "${CARD_HA_DIR}"
+cp "${CARD_DIST_DIR}/"* "${CARD_HA_DIR}/";
+# watch for changes in dist and copy to HA www dir
+( \
+    while inotifywait -qq -e modify,create "${CARD_DIST_DIR}"; \
+        do cp "${CARD_DIST_DIR}/"* "${CARD_HA_DIR}/"; \
+    done
+) &
+
+# Register the card as a dashboard resource
+mkdir -p "${PWD}/config/.storage"
+cp "${PWD}/scripts/lovelace_resources.json" "${PWD}/config/.storage/lovelace_resources"
+
+
+
 # Start Home Assistant
+
+echo 'Starting Home Assistant in development mode...
+    - Custom component mounted at /config/custom_components/simple_plant
+    - Custom card mounted at /config/www/community/simple-plant-card
+    - Access UI at http://localhost:8123
+
+    '
+
+
 hass --config "${PWD}/config" --debug

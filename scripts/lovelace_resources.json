@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace_resources",
+  "data": {
+    "items": [
+      {
+        "id": "simple_plant_card_dev",
+        "type": "module",
+        "url": "/local/community/simple-plant-card/simple-plant-card.js"
+      }
+    ]
+  }
+}

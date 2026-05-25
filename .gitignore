@@ -15,6 +15,6 @@ coverage.xml
 .ruff_cache
 
 
-# Home Assistant configuration
-config/*
-!config/configuration.yaml
+# Home Assistant dev
+config/
+.devcontainer/devcontainer-lock.json
