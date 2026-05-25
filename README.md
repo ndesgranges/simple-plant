@@ -55,6 +55,14 @@ This integration provides the following entities
 | select.simple_plant_**health**_@                 | A manual dumb selector just to note the current health of your plant, it doesn't do anything else |
 | sensor.simple_plant_**next_watering**_@          | Stores the next date a watering is expected |
 
+### Additionnal entities
+> Those are global to the integration and not linked to a plant in particular
+
+ Entity | Description |
+| ------ | ----------- |
+| sensor.plants_to_water | Count the amount of plants that are to water today or overdue !  |
+
+
 ## TODO
 
 See the [list of tasks to do](https://github.com/ndesgranges/simple-plant/issues?q=is%3Aissue%20state%3Aopen%20label%3Aaccepted)
