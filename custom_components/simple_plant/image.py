@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import aiofiles
+import aiofiles.os
 from homeassistant.components.image import (
     ImageEntity,
     ImageEntityDescription,
@@ -86,7 +87,7 @@ class SimplePlantImage(ImageEntity):
     async def async_image(self) -> bytes | None:
         """Return bytes of image."""
         file_path = Path(str(self._attr_image_url))
-        if file_path.exists():
+        if await aiofiles.os.path.exists(file_path):
             async with aiofiles.open(file_path, mode="rb") as file:
                 return await file.read()
         LOGGER.error("Image file not found")
