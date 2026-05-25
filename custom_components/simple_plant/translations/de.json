@@ -83,6 +83,9 @@
         "sensor": {
             "next_watering": {
                 "name": "Nächste Bewässerung"
+            },
+            "plants_to_water": {
+                "name": "Pflanzen zu gießen"
             }
         }
     },
