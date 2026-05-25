@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """Image platform for simple_plant."""
 
 from __future__ import annotations
@@ -43,7 +44,7 @@ async def async_setup_entry(
     )
 
 
-class SimplePlantImage(ImageEntity):
+class SimplePlantImage(ImageEntity):  # pylint: disable=abstract-method
     """simple_plant image class."""
 
     _attr_has_entity_name = True

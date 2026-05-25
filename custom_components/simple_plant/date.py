@@ -42,7 +42,7 @@ async def async_setup_entry(
     )
 
 
-class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):
+class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):  # pylint: disable=abstract-method
     """simple_plant date class."""
 
     _attr_has_entity_name = True

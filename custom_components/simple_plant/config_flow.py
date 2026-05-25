@@ -126,7 +126,7 @@ def option_form(suggested_species: str | None = None) -> vol.Schema:
 ## CONFIG FLOWS
 
 
-class SimplePlantFlowHandler(ConfigFlow, domain=DOMAIN):
+class SimplePlantFlowHandler(ConfigFlow, domain=DOMAIN):  # pylint: disable=abstract-method
     """Config flow for Simple Plant."""
 
     def __init__(self) -> None:

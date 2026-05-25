@@ -1,8 +1,9 @@
+# pylint: disable=duplicate-code
 """Number platform for simple_plant."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.number import (
     NumberDeviceClass,
@@ -12,14 +13,12 @@ from homeassistant.components.number import (
 )
 from homeassistant.const import UnitOfTime
 
-from .const import DOMAIN, LOGGER
+from .entity import SimplePlantStoredEntity
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-    from .coordinator import SimplePlantCoordinator
 
 
 ENTITY_DESCRIPTIONS = (
@@ -47,10 +46,9 @@ async def async_setup_entry(
     )
 
 
-class SimplePlantNumber(NumberEntity):
+class SimplePlantNumber(SimplePlantStoredEntity, NumberEntity):  # pylint: disable=abstract-method
     """simple_plant number class."""
 
-    _attr_has_entity_name = True
     _attr_should_poll = False
     _attr_native_min_value = 1
     _attr_native_max_value = 60
@@ -63,46 +61,13 @@ class SimplePlantNumber(NumberEntity):
         description: NumberEntityDescription,
     ) -> None:
         """Initialize the number class."""
-        super().__init__()
-        self._hass = hass
-        self._entry = entry
-        self.entity_description = description
-        self.coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
-
-        device = self.coordinator.device
-
-        self.entity_id = f"number.{DOMAIN}_{description.key}_{device}"
-        self._attr_unique_id = f"{DOMAIN}_{description.key}_{device}"
-
-        # set value
+        super().__init__(hass, entry, description, "number")
         self._fallback_value = entry.data.get("days_between_waterings")
+        self._attr_native_value: float | None = None
 
-        # Set up device info
-        self._attr_device_info = self.coordinator.device_info
-
-    @property
-    def device(self) -> str | None:
-        """Return the device name."""
-        return self.coordinator.device
-
-    async def async_added_to_hass(self) -> None:
-        """Run when entity is added to hass."""
-        await super().async_added_to_hass()
-
-        def warning(msg: str) -> None:
-            LOGGER.warning("%s :%s", self.unique_id, msg)
-
-        if self.coordinator.data is None:
-            warning("Coordinator not ready at initialization")
-            return
-        data = self.coordinator.data.get(self.unique_id)
-        if data is None:
-            if self._fallback_value is None:
-                warning("Initialization failed as _fallback_value is None")
-                return
-            await self.async_set_native_value(self._fallback_value)
-            return
-        await self.async_set_native_value(float(data))
+    async def _restore_value(self, value: Any) -> None:
+        """Restore a stored or fallback value."""
+        await self.async_set_native_value(float(value))
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""

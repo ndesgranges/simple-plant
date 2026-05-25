@@ -73,7 +73,7 @@ async def on_device_registry_update_handler(
     if not changes or not isinstance(changes, dict) or "name_by_user" not in changes:
         return
     # Get device
-    hass = async_get_hass()
+    hass: HomeAssistant = async_get_hass()
     device_registry = async_get(hass)
     device = device_registry.async_get(event.data.get("device_id"))
     if not device:
@@ -81,7 +81,7 @@ async def on_device_registry_update_handler(
     # Get entries
     entries: set[ConfigEntry] = set()
     for entry_id in device.config_entries:
-        entry = hass.config_entries.async_get_entry(entry_id)
+        entry = hass.config_entries.async_get_entry(entry_id)  # pylint: disable=no-member
         if entry:
             entries.add(entry)
     # Update entries
@@ -106,12 +106,12 @@ async def on_device_registry_update_handler(
         )
         new_title = device.name_by_user
 
-        coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]
+        coordinator: SimplePlantCoordinator = hass.data[DOMAIN][entry.entry_id]  # pylint: disable=no-member
         await coordinator.async_rename_device(slugify(new_title))
 
-        await hass.config_entries.async_unload(entry.entry_id)
-        hass.config_entries.async_update_entry(entry, data=data, title=new_title)
-        hass.config_entries.async_schedule_reload(entry.entry_id)
+        await hass.config_entries.async_unload(entry.entry_id)  # pylint: disable=no-member
+        hass.config_entries.async_update_entry(entry, data=data, title=new_title)  # pylint: disable=no-member
+        hass.config_entries.async_schedule_reload(entry.entry_id)  # pylint: disable=no-member
         device_registry.async_remove_device(device.id)
 
 

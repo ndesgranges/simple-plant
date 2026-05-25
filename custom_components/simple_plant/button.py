@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """Button platform for simple_plant."""
 
 from __future__ import annotations
@@ -40,7 +41,7 @@ async def async_setup_entry(
     )
 
 
-class SimplePlantButton(ButtonEntity):
+class SimplePlantButton(ButtonEntity):  # pylint: disable=abstract-method
     """simple_plant button class."""
 
     _attr_has_entity_name = True
