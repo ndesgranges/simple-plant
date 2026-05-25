@@ -77,12 +77,13 @@ def remove_photo(hass: HomeAssistant, entry: ConfigEntry) -> None:
 def user_form() -> vol.Schema:
     """Return a new device form."""
     LOGGER.debug("config_flow, 1st call : displaying form")
+    today = as_local(utcnow()).date().isoformat()
     return vol.Schema(
         {
             vol.Required("name"): selector.TextSelector(
                 selector.TextSelectorConfig(multiline=False, multiple=False)
             ),
-            vol.Required("last_watered"): selector.DateSelector(
+            vol.Required("last_watered", default=today): selector.DateSelector(
                 selector.DateSelectorConfig(),
             ),
             vol.Required("days_between_waterings"): selector.NumberSelector(
