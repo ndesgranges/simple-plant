@@ -3,12 +3,16 @@
 # Simple Plant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+![GitHub branch check runs](https://img.shields.io/github/check-runs/ndesgranges/simple-plant/main?style=for-the-badge)
+[![GitHub Release](https://img.shields.io/github/v/release/ndesgranges/simple-plant?display_name=tag&style=for-the-badge
+)](https://github.com/ndesgranges/simple-plant/releases)
 [![buymeacoffee](https://img.shields.io/badge/buy%20me%20a%20coffee-%23FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/ndesgranges)
 
 
 Simple plant aims to provide a very simple integration to help you list and take care of your plants without any external service or sensor.
 
-I also developped a custom card for this integration: [simple-plant-card](https://github.com/ndesgranges/simple-plant-card)
+> [!TIP]
+> I also developped a custom card for this integration: [simple-plant-card](https://github.com/ndesgranges/simple-plant-card)
 
 ## Context
 
@@ -37,7 +41,7 @@ https://github.com/ndesgranges/simple-plant
 
 This integration provides the following entities
 
-> NOTE: \
+> [!NOTE]
 > In the following table, `@` represent the name of the device, for example, If I've got a device called "Foo" `test_@` would be `test_foo`
 
 | Entity | Description |
@@ -56,6 +60,5 @@ This integration provides the following entities
 See the [list of tasks to do](https://github.com/ndesgranges/simple-plant/issues?q=is%3Aissue%20state%3Aopen%20label%3Aaccepted)
 
 ## Credits
-
 
 Even though it is not so much alike anymore, this project has been started using [ludeeus/integration_blueprint](https://github.com/ludeeus/integration_blueprint) template
