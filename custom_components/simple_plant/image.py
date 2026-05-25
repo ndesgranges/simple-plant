@@ -38,6 +38,8 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the image platform."""
+    if not entry.data.get("photo"):
+        return
     async_add_entities(
         SimplePlantImage(hass, entry, entity_description)
         for entity_description in ENTITY_DESCRIPTIONS

@@ -103,7 +103,7 @@ def user_form() -> vol.Schema:
                 )
             ),
             vol.Optional("species", default=""): str,
-            vol.Required("photo"): selector.FileSelector(
+            vol.Optional("photo"): selector.FileSelector(
                 selector.FileSelectorConfig(accept="image/*")
             ),
         }
@@ -170,20 +170,15 @@ class SimplePlantFlowHandler(ConfigFlow, domain=DOMAIN):  # pylint: disable=abst
                     data_schema=user_form(),
                     errors={"base": "invalid_future_date"},
                 )
-        if "photo" not in user_input:
-            return self.async_show_form(
-                step_id="user",
-                errors={"base": "upload_failed_generic"},
-            )
-        file_id = user_input["photo"]
-
-        try:
-            user_input["photo"] = await save_image(self.hass, file_id)
-        except ValueError:
-            return self.async_show_form(
-                step_id="user",
-                errors={"base": "upload_failed_type"},
-            )
+        if user_input.get("photo"):
+            file_id = user_input["photo"]
+            try:
+                user_input["photo"] = await save_image(self.hass, file_id)
+            except ValueError:
+                return self.async_show_form(
+                    step_id="user",
+                    errors={"base": "upload_failed_type"},
+                )
 
         return self.async_create_entry(title=user_input["name"], data=user_input)
 
