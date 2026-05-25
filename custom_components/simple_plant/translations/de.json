@@ -1,0 +1,94 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "Geben Sie die Basisinformationen für Ihre neue Pflanze ein.",
+                "data": {
+                    "name": "Name",
+                    "last_watered": "Zuletzt gegossen",
+                    "days_between_waterings": "Tage zwischen den Bewässerungen",
+                    "photo": "Foto",
+                    "health": "Gesundheitszustand (Optional)",
+                    "species": "Art/Sorte Ihrer Pflanze (Optional)"
+                }
+            }
+        },
+        "error": {
+            "invalid_future_date": "Es kann kein Bewässerungsdatum in der Zukunft festgelegt werden.",
+            "name_exist": "Eine Pflanze mit diesem Namen existiert bereits.",
+            "upload_failed_generic": "Datei-Upload fehlgeschlagen, es ist ein Fehler aufgetreten.",
+            "upload_failed_type": "Datei-Upload fehlgeschlagen, der Dateityp wird nicht unterstützt.",
+            "unknown": "Unbekannter Fehler aufgetreten."
+        },
+        "abort": {
+            "already_configured": "Dieser Eintrag ist bereits konfiguriert."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "description": "Ändern Sie die Art oder das Bild Ihrer Pflanze.",
+                "data": {
+                    "photo": "Foto",
+                    "species": "Art/Sorte Ihrer Pflanze (Optional)"
+                }
+            }
+        },
+        "error": {
+            "upload_failed_type": "Datei-Upload fehlgeschlagen, der Dateityp wird nicht unterstützt."
+        }
+    },
+    "entity": {
+        "button": {
+            "mark_watered": {
+                "name": "Gegossen"
+            }
+        },
+        "binary_sensor": {
+            "todo": {
+                "name": "Bewässern"
+            },
+            "problem": {
+                "name": "Bewässerung nötig"
+            }
+        },
+        "date": {
+            "last_watered": {
+                "name": "Zuletzt gegossen"
+            }
+        },
+        "image": {
+            "picture": {
+                "name": "Bild"
+            }
+        },
+        "number": {
+            "days_between_waterings": {
+                "name": "Tage zwischen den Bewässerungen"
+            }
+        },
+        "select": {
+            "health": {
+                "name": "Gesundheitszustand",
+                "state": {
+                    "notset": "Nicht festgelegt",
+                    "poor": "schlecht",
+                    "fair": "Okay",
+                    "good": "Gut",
+                    "verygood": "Sehr Gut",
+                    "excellent": "Ausgezeichnet"
+                }
+            }
+        },
+        "sensor": {
+            "next_watering": {
+                "name": "Nächste Bewässerung"
+            }
+        }
+    },
+    "exceptions": {
+        "invalid_future_date": {
+            "message": "Es kann kein Bewässerungsdatum in der Zukunft festgelegt werden."
+        }
+    }
+}
