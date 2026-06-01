@@ -1,6 +1,6 @@
 colorlog==6.10.1
 homeassistant
-pip>=25.1
+pip>=26.1.2
 ruff==0.15.14
 aiofiles==25.1.0
 pylint==3.0.0
