@@ -82,7 +82,8 @@ async def on_device_registry_update_handler(
     entries: set[ConfigEntry] = set()
     for entry_id in device.config_entries:
         entry = hass.config_entries.async_get_entry(entry_id)  # pylint: disable=no-member
-        if entry:
+        # Only handle our own entries: the listener fires for devices of every integration
+        if entry and entry.domain == DOMAIN:
             entries.add(entry)
     # Update entries
     for entry in entries:
