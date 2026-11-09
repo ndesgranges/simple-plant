@@ -13,7 +13,9 @@ from typing import TYPE_CHECKING
 
 import aiofiles.os
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import async_get_hass
+from homeassistant.const import Platform
+from homeassistant.core import async_get_hass, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.config_validation import config_entry_only_config_schema
 from homeassistant.helpers.device_registry import (
     EVENT_DEVICE_REGISTRY_UPDATED,
@@ -42,6 +44,34 @@ async def async_setup(hass: HomeAssistant, _config: ConfigType) -> bool:
     """Set up the Simple Plant component."""
     hass.data.setdefault(DOMAIN, {})
     hass.http.register_view(SimplePlantPhotoView)
+
+    @callback
+    def is_tracked_entity_renamed(data: er.EventEntityRegistryUpdatedData) -> bool:
+        """Return True if a date or number entity of a plant got a new entity_id."""
+        return (
+            data["action"] == "update"
+            and "entity_id" in data["changes"]
+            and (registry_entry := er.async_get(hass).async_get(data["entity_id"]))
+            is not None
+            and registry_entry.platform == DOMAIN
+            and registry_entry.domain in (Platform.DATE, Platform.NUMBER)
+        )
+
+    @callback
+    def on_tracked_entity_renamed(
+        event: Event[er.EventEntityRegistryUpdatedData],
+    ) -> None:
+        """Reload the plant so that its sensors track the new entity_id."""
+        registry_entry = er.async_get(hass).async_get(event.data["entity_id"])
+        if registry_entry and registry_entry.config_entry_id:
+            hass.config_entries.async_schedule_reload(registry_entry.config_entry_id)
+
+    # Registered once, so that it is not missed while a plant is reloading
+    hass.bus.async_listen(
+        er.EVENT_ENTITY_REGISTRY_UPDATED,
+        on_tracked_entity_renamed,
+        event_filter=is_tracked_entity_renamed,
+    )
     return True
 
 

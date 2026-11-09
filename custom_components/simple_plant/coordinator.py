@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.exceptions import ServiceValidationError
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import slugify
@@ -167,11 +168,19 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
             )
         await self.async_set_last_watered(today)
 
+    def get_entity_id(self, platform: str, key: str) -> str:
+        """Return the entity_id of a plant entity, which may be renamed by users."""
+        unique_id = f"{DOMAIN}_{key}_{self.device}"
+        return (
+            er.async_get(self.hass).async_get_entity_id(platform, DOMAIN, unique_id)
+            or f"{platform}.{unique_id}"
+        )
+
     def get_dates(self) -> dict[str, datetime] | None:
         """Get dates from relevants device entites states."""
         states_to_get = {
-            "last_watered": f"date.{DOMAIN}_last_watered_{self.device}",
-            "nb_days": f"number.{DOMAIN}_days_between_waterings_{self.device}",
+            "last_watered": self.get_entity_id("date", "last_watered"),
+            "nb_days": self.get_entity_id("number", "days_between_waterings"),
         }
 
         # Get states from hass
@@ -201,8 +210,8 @@ class SimplePlantCoordinator(DataUpdateCoordinator[dict]):
     def get_fertilization_dates(self) -> dict[str, datetime] | None:
         """Get fertilization dates from relevant device entity states."""
         states_to_get = {
-            "last_fertilized": f"date.{DOMAIN}_last_fertilized_{self.device}",
-            "nb_days": (f"number.{DOMAIN}_days_between_fertilizations_{self.device}"),
+            "last_fertilized": self.get_entity_id("date", "last_fertilized"),
+            "nb_days": self.get_entity_id("number", "days_between_fertilizations"),
         }
 
         data = {key: self.hass.states.get(eid) for key, eid in states_to_get.items()}

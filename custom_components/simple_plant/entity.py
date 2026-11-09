@@ -69,14 +69,10 @@ class SimplePlantTrackedEntity(SimplePlantEntity):
         self.async_on_remove(  # pylint: disable=no-member
             async_track_state_change_event(
                 self.hass,
-                f"date.{DOMAIN}_{self._tracked_date_key}_{self.device}",
-                self._update_state,
-            )
-        )
-        self.async_on_remove(  # pylint: disable=no-member
-            async_track_state_change_event(
-                self.hass,
-                f"number.{DOMAIN}_{self._tracked_number_key}_{self.device}",
+                [
+                    self.coordinator.get_entity_id("date", self._tracked_date_key),
+                    self.coordinator.get_entity_id("number", self._tracked_number_key),
+                ],
                 self._update_state,
             )
         )
