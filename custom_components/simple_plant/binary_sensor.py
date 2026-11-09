@@ -1,3 +1,4 @@
+# MIT LICENCE - Copyright (c) 2026  ndesgranges
 """Binary sensor platform for simple_plant."""
 
 from __future__ import annotations

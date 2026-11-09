@@ -1,3 +1,4 @@
+# MIT LICENCE - Copyright (c) 2026  ndesgranges
 # pylint: disable=duplicate-code
 """Select platform for simple_plant."""
 

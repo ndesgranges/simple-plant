@@ -1,3 +1,4 @@
+# MIT LICENCE - Copyright (c) 2026  ndesgranges
 """Base entity for simple_plant."""
 
 from __future__ import annotations
