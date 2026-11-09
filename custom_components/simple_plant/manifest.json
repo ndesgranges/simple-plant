@@ -6,7 +6,8 @@
     ],
     "config_flow": true,
     "dependencies": [
-        "file_upload"
+        "file_upload",
+        "http"
     ],
     "documentation": "https://github.com/ndesgranges/simple-plant",
     "integration_type": "device",
