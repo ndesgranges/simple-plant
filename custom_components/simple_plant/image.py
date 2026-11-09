@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -47,7 +48,7 @@ async def async_setup_entry(
     )
 
 
-class SimplePlantImage(ImageEntity):  # pylint: disable=abstract-method
+class SimplePlantImage(ImageEntity):  # pylint: disable=abstract-method,too-many-instance-attributes
     """simple_plant image class."""
 
     _attr_has_entity_name = True
@@ -70,6 +71,8 @@ class SimplePlantImage(ImageEntity):  # pylint: disable=abstract-method
         self._attr_image_url = hass.config.path(image_path.lstrip("/"))
 
         self._attr_content_type = self._get_content_type(Path(image_path))
+        if history := entry.data.get("photo_history"):
+            self._attr_image_last_updated = datetime.fromisoformat(history[-1]["date"])
 
         self.entity_id = f"image.{DOMAIN}_{description.key}_{device}"
         self._attr_unique_id = f"{DOMAIN}_{description.key}_{device}"

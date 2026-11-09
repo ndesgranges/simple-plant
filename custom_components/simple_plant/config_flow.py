@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import aiofiles
 import aiofiles.os
@@ -25,6 +25,8 @@ from homeassistant.util.dt import as_local, as_utc, utcnow
 from .const import DOMAIN, HEALTH_OPTIONS, IMAGES_MIME_TYPES, LOGGER, STORAGE_DIR
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from homeassistant.core import HomeAssistant
 
 ## UTILS
@@ -51,25 +53,30 @@ async def save_image(hass: HomeAssistant, file_id: str) -> str:
         return f"/{STORAGE_DIR}/{file_path.name}"
 
 
-def remove_photo(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Remove the photo file of a config entry."""
-    try:
-        # Get the photo path from the entry's data
-        photo_path = entry.data.get("photo")
-        if photo_path:
-            # Convert url path to actual file path
-            file_path = Path(str(hass.config.path(photo_path.lstrip("/"))))
+def add_to_photo_history(data: Mapping[str, Any], photo: str) -> list[dict[str, str]]:
+    """Return the photo history of a plant with a new photo taken now."""
+    return [
+        *data.get("photo_history", []),
+        {"path": photo, "date": utcnow().isoformat()},
+    ]
 
-            LOGGER.info("Trying to remove: %s", photo_path)
 
-            # Check if file exists before trying to remove it
-            if file_path.exists():
-                file_path.unlink()
-                LOGGER.info("Successfully removed image file: %s", file_path)
-            else:
-                LOGGER.warning("Image file not found: %s", file_path)
-    except OSError as err:
-        LOGGER.error("Error reading image file %s: %s", file_path, err)
+def remove_photos(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Remove all the photo files of a config entry."""
+    photo_paths = {photo["path"] for photo in entry.data.get("photo_history", [])}
+    if entry.data.get("photo"):
+        photo_paths.add(entry.data["photo"])
+
+    for photo_path in photo_paths:
+        # Convert url path to actual file path
+        file_path = Path(hass.config.path(photo_path.lstrip("/")))
+        try:
+            file_path.unlink()
+            LOGGER.info("Successfully removed image file: %s", file_path)
+        except FileNotFoundError:
+            LOGGER.warning("Image file not found: %s", file_path)
+        except OSError as err:
+            LOGGER.error("Error removing image file %s: %s", file_path, err)
 
 
 ## CONFIG FLOW SCHEMAS
@@ -153,6 +160,9 @@ def option_form(suggested_species: str | None = None) -> vol.Schema:
 class SimplePlantFlowHandler(ConfigFlow, domain=DOMAIN):  # pylint: disable=abstract-method
     """Config flow for Simple Plant."""
 
+    VERSION = 1
+    MINOR_VERSION = 2
+
     def __init__(self) -> None:
         """Init."""
         self._user_inputs: dict = {}
@@ -198,6 +208,9 @@ class SimplePlantFlowHandler(ConfigFlow, domain=DOMAIN):  # pylint: disable=abst
             file_id = user_input["photo"]
             try:
                 user_input["photo"] = await save_image(self.hass, file_id)
+                user_input["photo_history"] = add_to_photo_history(
+                    {}, user_input["photo"]
+                )
             except ValueError:
                 return self.async_show_form(
                     step_id="user",
@@ -253,7 +266,10 @@ class SimplePlantOptionFlowHandler(OptionsFlow):
             try:
                 file_id = user_input["photo"]
                 self.user_inputs["photo"] = await save_image(self.hass, file_id)
-                remove_photo(self.hass, self.entry)
+                # Previous photos are kept to show the plant evolution
+                self.user_inputs["photo_history"] = add_to_photo_history(
+                    self.entry.data, self.user_inputs["photo"]
+                )
             except ValueError:
                 return self.async_show_form(
                     step_id="user",

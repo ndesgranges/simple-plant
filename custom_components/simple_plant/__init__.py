@@ -8,8 +8,10 @@ https://github.com/ndesgranges/simple-plant
 
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
+import aiofiles.os
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import async_get_hass
 from homeassistant.helpers.config_validation import config_entry_only_config_schema
@@ -20,10 +22,12 @@ from homeassistant.helpers.device_registry import (
     async_get,
 )
 from homeassistant.util import slugify
+from homeassistant.util.dt import utc_from_timestamp
 
-from .config_flow import remove_photo
+from .config_flow import remove_photos
 from .const import DOMAIN, LOGGER, PLATFORMS
 from .coordinator import SimplePlantCoordinator
+from .media_source import SimplePlantPhotoView
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -37,6 +41,34 @@ CONFIG_SCHEMA = config_entry_only_config_schema(DOMAIN)  # pylint: disable=inval
 async def async_setup(hass: HomeAssistant, _config: ConfigType) -> bool:
     """Set up the Simple Plant component."""
     hass.data.setdefault(DOMAIN, {})
+    hass.http.register_view(SimplePlantPhotoView)
+    return True
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate an old entry."""
+    if entry.version > 1:
+        # Downgraded from a future version
+        return False
+
+    if entry.minor_version < 2:  # noqa: PLR2004
+        # 1.2: Photo history
+        history = []
+        if photo := entry.data.get("photo"):
+            with suppress(OSError):
+                stat = await aiofiles.os.stat(hass.config.path(photo.lstrip("/")))
+                date = utc_from_timestamp(stat.st_mtime).isoformat()
+                history.append({"path": photo, "date": date})
+        hass.config_entries.async_update_entry(
+            entry, data={**entry.data, "photo_history": history}, minor_version=2
+        )
+
+    LOGGER.debug(
+        "Migrated %s to version %s.%s",
+        entry.title,
+        entry.version,
+        entry.minor_version,
+    )
     return True
 
 
@@ -136,8 +168,8 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     coordinator = SimplePlantCoordinator(hass, entry)
     await coordinator.remove_device_from_storage()
 
-    # Remove photo
-    remove_photo(hass, entry)
+    # Remove photos
+    await hass.async_add_executor_job(remove_photos, hass, entry)
 
 
 async def async_reload_entry(

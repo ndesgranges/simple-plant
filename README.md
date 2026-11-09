@@ -50,7 +50,7 @@ This integration provides the following entities
 | binary_sensor.simple_plant_**problem**_@         | `true` (and labelled as problem) if the plant "water date" is overdue |
 | button.simple_plant_**mark_watered**_@           | Mark the plant as watered |
 | date.simple_plant_**last_watered**_@             | Last time the plant has been marked as watered. In Theory it should not need to be changed manually, but it's there for flexibility |
-| image.simple_plant_**picture**_@                 | Just a picture of your plant to show in your dashboard |
+| image.simple_plant_**picture**_@                 | The latest picture of your plant to show in your dashboard (its state is the date the picture was added) |
 | number.simple_plant_**days_between_waterings**_@ | Amount of days to wait before each watering before notifying |
 | select.simple_plant_**health**_@                 | A manual dumb selector just to note the current health of your plant, it doesn't do anything else |
 | sensor.simple_plant_**next_watering**_@          | Stores the next date a watering is expected |
@@ -62,6 +62,12 @@ This integration provides the following entities
 | ------ | ----------- |
 | sensor.plants_to_water | Count the amount of plants that are to water today or overdue !  |
 
+
+## Photo history
+
+Every picture you add to a plant (when creating it, or later from its `Configure` menu) is kept, so you can see the evolution of your plants over time.
+
+Browse them from the **Media** panel in Home Assistant, under `Simple Plant` > your plant. Pictures are removed when the plant is deleted.
 
 ## TODO
 
