@@ -1,3 +1,4 @@
+# MIT LICENCE - Copyright (c) 2026  ndesgranges
 """Adds config flow for Simple PLant."""
 
 from __future__ import annotations

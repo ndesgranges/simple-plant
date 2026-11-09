@@ -1,3 +1,4 @@
+# MIT LICENCE - Copyright (c) 2026  ndesgranges
 # pylint: disable=duplicate-code
 """Number platform for simple_plant."""
 

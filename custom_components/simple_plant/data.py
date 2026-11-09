@@ -1,3 +1,4 @@
+# MIT LICENCE - Copyright (c) 2026  ndesgranges
 """Storage helper for simple_plant."""
 
 from typing import Any, ClassVar, Self
