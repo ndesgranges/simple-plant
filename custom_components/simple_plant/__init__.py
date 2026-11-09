@@ -1,3 +1,4 @@
+# MIT LICENCE - Copyright (c) 2026  ndesgranges
 """
 Custom integration to integrate simple_plant with Home Assistant.
 
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
     from homeassistant.helpers.typing import ConfigType
 
 
-CONFIG_SCHEMA = config_entry_only_config_schema(DOMAIN)
+CONFIG_SCHEMA = config_entry_only_config_schema(DOMAIN)  # pylint: disable=invalid-name
 
 
 async def async_setup(hass: HomeAssistant, _config: ConfigType) -> bool:
