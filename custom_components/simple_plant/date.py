@@ -114,6 +114,16 @@ class SimplePlantDate(CoordinatorEntity[SimplePlantCoordinator], DateEntity):  #
 
         return as_local(datetime.fromisoformat(date_str)).date()
 
+    @property
+    def extra_state_attributes(self) -> dict[str, date | None]:
+        """Return the value restored when undoing a watering."""
+        old = (self.coordinator.data or {}).get("_old_last_watered")
+        return {
+            "previous_value": as_local(datetime.fromisoformat(old)).date()
+            if old
+            else None
+        }
+
 
 class SimplePlantFertilizationDate(  # pylint: disable=abstract-method
     CoordinatorEntity[SimplePlantCoordinator], DateEntity
