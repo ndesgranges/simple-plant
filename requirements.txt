@@ -3,4 +3,4 @@ homeassistant
 pip>=26.2.1
 ruff==0.17.4
 aiofiles==25.1.0
-pylint==4.0.7
+pylint==4.1.3
